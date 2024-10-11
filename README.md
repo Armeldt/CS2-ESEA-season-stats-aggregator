@@ -1,6 +1,6 @@
 # CS2 Data Analysis Project
 
-<img src="https://github.com/Armeldt/Python---Projet-data-CS2/blob/main/counter_strike_2.jpg?raw=true" alt="logo" width="500"/>
+<img src="https://github.com/Armeldt/Python---Projet-data-CS2/blob/main/counter_strike_2.jpg?raw=true" alt="logo" width="1000"/>
 
 This project aims to provide in-depth data from CS2 matches for subtop competitive teams, helping them analyze and improve their performance, for example, throughout ESEA seasons.
 
