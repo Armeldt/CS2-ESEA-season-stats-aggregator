@@ -8,7 +8,8 @@ The project is divided into two tools:
 
 ## 1. Season Stats Aggregator:
 
-  - A tool that compiles both basic and advanced stats from multiple games (such as an ESEA season). The goal is for players to track their performance across the season with detailed stats and visualizations, which they can also share on social media, especially when looking for a new team.
+  - A tool that compiles both basic and advanced stats from multiple games (such as an ESEA season) for each players. The goal is for players to track their performance across the season with detailed stats and visualizations, which they can also share on social media, especially when looking for a new team.
+  - A tool that summarize the team's season with stats being team wise.
 
 ## 2. Single Match Analyzer:
 
