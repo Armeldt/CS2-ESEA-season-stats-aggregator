@@ -23,7 +23,7 @@
   },
   "CTkLabel": {
     "corner_radius": 0,
-    "fg_color": "transparent",
+    "fg_color": "transparent", 
     "text_color": ["gray14", "gray84"]
   },
   "CTkEntry": {
