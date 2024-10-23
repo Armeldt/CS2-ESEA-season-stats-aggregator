@@ -1,6 +1,6 @@
 # CS2 Data Analysis Project
 
-<img src="[https://github.com/Armeldt/CS2-ESEA-season-stats-aggregator/blob/main/Assets/logos/counter_strike_2.jpg?raw=true" alt="logo" width="1000"/>
+<img src="https://github.com/Armeldt/CS2-ESEA-season-stats-aggregator/blob/main/Assets/logos/counter_strike_2.jpg?raw=true" alt="logo" width="1000"/>
 
 This project is designed to provide CS2 esports enthusiasts with an advanced tool for in-depth analysis of official match data, whether from online or LAN tournaments, ESEA seasons, and more.
 
