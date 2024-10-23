@@ -1,21 +1,20 @@
 # CS2 Data Analysis Project
 
-<img src="[https://github.com/Armeldt/Python---Projet-data-CS2/blob/main/counter_strike_2.jpg](https://github.com/Armeldt/CS2-ESEA-season-stats-aggregator/blob/main/Assets/logos/counter_strike_2.jpg)?raw=true" alt="logo" width="1000"/>
+<img src="[https://github.com/Armeldt/CS2-ESEA-season-stats-aggregator/blob/main/Assets/logos/counter_strike_2.jpg?raw=true" alt="logo" width="1000"/>
 
-This project aims to provide in-depth data from CS2 matches for subtop competitive teams, helping them analyze and improve their performance, for example, throughout ESEA seasons.
+This project is designed to provide CS2 esports enthusiasts with an advanced tool for in-depth analysis of official match data, whether from online or LAN tournaments, ESEA seasons, and more.
 
-The project is divided into two tools:
+The project is divided into two main components:
 
-## 1. Season Stats Aggregator:
+## 1. Stats Aggregator
 
-  - A tool that compiles both basic and advanced stats from multiple games (such as an ESEA season) for each players. The goal is for players to track their performance across the season with detailed stats and visualizations, which they can also share on social media, especially when looking for a new team.
-  - A tool that summarize the team's season with stats being team wise.
+- Offers detailed player statistics, emphasizing individual performance within the team. Key performance indicators (KPIs) include fragging ability, utility usage efficiency, clutching, team play, and more.
 
-## 2. Single Match Analyzer:
+- Provides team statistics (e.g., overall wins/losses, map-specific win rates, closest wins, largest losses) from all demo files uploaded by the user.
 
-  - A tool focused on the detailed analysis of a specific match, offering an in-depth view of game progression. This tool is designed to facilitate post-match debriefs or help teams prepare for upcoming opponents.
+## 2. Single Match Analyzer
 
-The primary focus is to deliver advanced stats such as clutches, trade kills, utility efficiency, and economic insights.
+- Focuses on a detailed analysis of a specific match, offering an in-depth view of game progression. This tool is ideal for post-match debriefs and team preparation for upcoming opponents.
 
-This project is developed in Python using the demoparser2 library by LaihoE.
+The project is developed in Python, utilizing the demoparser2 library by LaihoE for demo analysis, and Custom Tkinter for the GUI.
 
