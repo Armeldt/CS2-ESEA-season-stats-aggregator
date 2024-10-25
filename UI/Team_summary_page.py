@@ -1,7 +1,11 @@
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image, ImageOps, ImageDraw
+# from Demo_analyse_script import *
 from CTkTable import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
 
 def round_corners_top(image, radius, background_color=(141, 141, 185)):
     """Applique des coins arrondis uniquement en haut à une image et ajoute une couleur de fond."""
@@ -170,20 +174,87 @@ class App(ctk.CTk):
 
         # Configure grid for the frame_right (columns 1 and 2 combined)
         frame_right.grid_columnconfigure((0, 1, 2 ), weight=1)  
-        frame_right.grid_rowconfigure((0, 1, 2), weight=1)
+        frame_right.grid_rowconfigure(0, weight=1)
+        frame_right.grid_rowconfigure((1, 2), weight=10)
 
         frame_rounds_type_data_frame = ctk.CTkFrame(frame_right, fg_color='#8D8DB9', corner_radius=20)
-        frame_rounds_type_data_frame.grid(row=0,column=0, columnspan=3,padx=20,pady=20,sticky='nsew')
+        frame_rounds_type_data_frame.grid(row=0,column=0, columnspan=3,rowspan=2,padx=20,pady=20,sticky='nsew')
     
 
-        frame_rounds_type_title_frame = ctk.CTkFrame(frame_right, fg_color='#28397F', corner_radius=20,background_corner_colors=('#212121','#8D8DB9','#8D8DB9','#8D8DB9'))
-        frame_rounds_type_title_frame.grid_rowconfigure((0, 1), weight=1)
-        frame_rounds_type_title_frame.grid(row=0,column=0,padx=20, pady=(20,0), sticky="nw")
+        frame_rounds_type_title = ctk.CTkFrame(frame_right, fg_color='#28397F', corner_radius=20,background_corner_colors=('#212121','#8D8DB9','#8D8DB9','#8D8DB9'))
+        frame_rounds_type_title.grid_rowconfigure((0, 1), weight=1)
+        frame_rounds_type_title.grid(row=0,column=0,padx=20, pady=(20,0), sticky="nw")
 
-        rounds_type_title = ctk.CTkLabel(frame_rounds_type_title_frame,text="Win rate by round type", font=("Stratum2 Bd", 28), text_color='white')
-        rounds_type_title.grid(row=0, column=0, padx=20, pady=20, sticky="n")
+        rounds_type_title = ctk.CTkLabel(frame_rounds_type_title,text="Win rate by round type", font=("Stratum2 Bd", 28), text_color='white')
+        rounds_type_title.grid(row=0, column=0,columnspan=2, padx=20, pady=20, sticky="n")
 
         
+        frame_round_type_viz_pistol = ctk.CTkFrame(frame_right, fg_color='red')
+        frame_round_type_viz_pistol.grid_columnconfigure((0, 1), weight=1)
+        frame_round_type_viz_pistol.grid_rowconfigure(0, weight=1)
+        frame_round_type_viz_pistol.grid_rowconfigure(1, weight=3)
+        frame_round_type_viz_pistol.grid(row=1,column=0,padx=40, pady=20, sticky="nw")
+
+        viz_1_title = ctk.CTkLabel(frame_round_type_viz_pistol,text="Win rate Pistol Rounds", font=("Stratum2 Bd", 14), text_color='white',fg_color='#8D8DB9')
+        viz_1_title.grid(row=0, column=0,columnspan=2,sticky="nsew")
+
+    
+        
+        #Données pour le graphique de jauge
+        value = 75
+        title_text = "Terrorist"
+        gauge_color = "#fbac18"
+        # Paramètres de la jauge
+        min_val, max_val = 0, 100
+        angle_range = 270  
+        value_range = max_val - min_val
+        angle = value
+        fig, ax = plt.subplots(figsize=(1, 1), subplot_kw={'projection': 'polar'})
+        ax.barh(1, np.radians(angle_range), left=np.radians(225), color=gauge_color, height=0.3)
+        ax.barh(1, np.radians(angle), left=np.radians(225), color="lightgray", height=0.3)
+        ax.text(0, 0, f"{value:.0f}%", ha='center', va='center', fontsize=8, color="white")
+        ax.set_title(title_text, color='white', fontsize=8, pad=10)
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        ax.set_yticks([])
+        ax.set_xticks([])
+        ax.spines.clear()
+        fig.patch.set_alpha(0)  
+        ax.patch.set_alpha(0)  
+        ax.set_theta_offset(np.pi / 2)
+        canvas1 = FigureCanvasTkAgg(fig, master=frame_round_type_viz_pistol) 
+        canvas1.draw() 
+        canvas1.get_tk_widget().config(bg="#8D8DB9", highlightthickness=0) 
+        canvas1.get_tk_widget().grid(row=1, column=0, sticky="nsew")
+        
+
+        # Exemple de données pour le graphique de jauge
+        value = 25  # Exemple de pourcentage à remplir
+        title_text = "Counter Terrorist"
+        gauge_color = "#28397f"  # Couleur pour le remplissage de la jauge
+        min_val, max_val = 0, 100
+        angle_range = -270  # Plage d'angle pour la jauge (3/4 de cercle), avec un pas négatif pour aller de 315° à 44°
+        value_range = max_val - min_val
+        fill_angle = angle_range * (value / 100)  # Angle correspondant à la valeur de remplissage
+        fig, ax = plt.subplots(figsize=(1, 1), subplot_kw={'projection': 'polar'})
+        ax.barh(1, np.radians(angle_range), left=np.radians(315), color="lightgray", height=0.3)
+        ax.barh(1, np.radians(fill_angle), left=np.radians(315), color=gauge_color, height=0.3)
+        ax.text(0, 0, f"{value:.0f}%", ha='center', va='center', fontsize=8, color="white")
+        plt.title(title_text, color='white', fontsize=14, pad=20)
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        ax.set_yticks([])
+        ax.set_xticks([])
+        ax.spines.clear()
+        fig.patch.set_alpha(0)
+        ax.patch.set_alpha(0)
+        ax.set_theta_offset(-np.pi / 2)
+
+        # Affichage du graphique dans tkinter
+        canvas2 = FigureCanvasTkAgg(fig, master=frame_round_type_viz_pistol) 
+        canvas2.draw() 
+        canvas2.get_tk_widget().config(bg="#8D8DB9", highlightthickness=0) 
+        canvas2.get_tk_widget().grid(row=1, column=1, sticky="nsew")
         
         
         # #affichage d'une table
@@ -198,4 +269,5 @@ class App(ctk.CTk):
 
 if __name__ == "__main__":
     app = App()
+    app.protocol("WM_DELETE_WINDOW", app.quit)
     app.mainloop()

@@ -6,9 +6,11 @@ from PIL import Image
 import pandas as pd
 import numpy as np
 from demoparser2 import DemoParser
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 ########################### 
 #### color palette CS2 ####s
@@ -40,6 +42,7 @@ largest_win = None
 closest_win = None
 largest_loss = None
 closest_loss = None  
+cumulative_stats = None
 
 def get_team_name(event=None): 
     global team_name 
@@ -66,6 +69,7 @@ def analyze():
     global closest_win
     global largest_loss
     global closest_loss
+    global cumulative_stats
 
     team = get_team_name()  # Appelle la fonction pour obtenir le nom de l'équipe
     demo_directory = file_paths  # Utiliser le dossier sélectionné
@@ -197,7 +201,11 @@ def analyze():
             # Ajout du dictionnaire à la liste
             all_matches.append(match_data)
 
+
+            #######################################
             #### calculs des indicateurs equipe ###
+            #######################################
+
 
             # Liste pour stocker les informations des matchs
             match_data = []
@@ -318,6 +326,148 @@ def analyze():
             else:
                 print(f"{team_name} n'a pas encore perdu de match.")
 
+            ### analyse par types de rounds ###
+
+            # Initialiser un DataFrame global pour stocker les rounds par catégorie et par side cumulés
+            all_matches_round_analysis = pd.DataFrame()
+
+            # Initialiser des compteurs globaux pour les cas particuliers
+            total_force_against_zobrux_lost = 0
+            total_eco_against_zobrux_lost = 0
+            total_zobrux_eco_against_full_win = 0
+            total_zobrux_force_against_full_win = 0
+
+            # Parcourir chaque match dans 'all_matches'
+            for match_data in all_matches:
+                eco_by_team = match_data['eco_info']
+                game_id = match_data['team_info']['Game_id'].iloc[0]
+                round_info = match_data['round_info']
+
+                eco_by_team['Game_id'] = game_id
+                round_info['Game_id'] = game_id
+
+                # Fusionner les données de rounds avec l'économie totale de l'équipe de l'attaquant
+                df_merged_team = pd.merge(eco_by_team, round_info[['total_rounds_played', 'Game_id', 'winner']], how='left',
+                                        left_on=['total_rounds_played', 'Game_id'],
+                                        right_on=['total_rounds_played', 'Game_id'])
+                df_merged_team['side'] = df_merged_team['side'].replace({'TERRORIST': 'T'})
+
+                # Appliquer la fonction de catégorisation pour classer les rounds
+                def categorize_rounds(row):
+                    if row['total_rounds_played'] in [1, 13]:
+                        return 'Pistol round'
+                    elif row['current_equip_value'] <= 3500:
+                        return 'Eco round'
+                    elif row['current_equip_value'] <= 18000:
+                        return 'Force buy round'
+                    else:
+                        return 'Full buy round'
+
+                df_merged_team['round_category'] = df_merged_team.apply(categorize_rounds, axis=1)
+                df_merged_team['is_team'] = df_merged_team['team_clan_name'] == team
+                df_merged_team = df_merged_team.sort_values(by=['total_rounds_played', 'is_team'], ascending=[True, False])
+                df_merged_team = df_merged_team.drop(columns=['is_team'])
+
+                # Filtrer les rounds joués par zobrux
+                rounds_team = df_merged_team[df_merged_team['team_clan_name'] == team]
+
+                # Calculer le nombre total de rounds joués dans chaque catégorie et par side
+                total_rounds_per_category_side = rounds_team.groupby(['round_category', 'side']).size()
+
+                # Calculer le nombre de victoires par catégorie et par side
+                wins_per_category_side = rounds_team[rounds_team['winner'] == rounds_team['side']].groupby(['round_category', 'side']).size()
+
+                # Calculer le nombre de défaites par catégorie et par side
+                losses_per_category_side = rounds_team[rounds_team['winner'] != rounds_team['side']].groupby(['round_category', 'side']).size()
+
+                # Combiner les résultats dans un DataFrame pour chaque match
+                match_stats = pd.DataFrame({
+                    'total_rounds': total_rounds_per_category_side,
+                    'wins': wins_per_category_side,
+                    'losses': losses_per_category_side
+                }).fillna(0).astype(int)
+
+                # Cumuler les résultats dans le DataFrame global
+                all_matches_round_analysis = pd.concat([all_matches_round_analysis, match_stats])
+
+                # Grouper par catégorie et side pour obtenir les statistiques cumulées
+                cumulative_stats = all_matches_round_analysis.groupby(['round_category', 'side']).sum()
+
+                # Calculer les pourcentages de victoires et de défaites
+                cumulative_stats['win_%'] = round((cumulative_stats['wins'] / cumulative_stats['total_rounds']) * 100, 1)
+                cumulative_stats['loss_%'] = round((cumulative_stats['losses'] / cumulative_stats['total_rounds']) * 100, 1)
+                cumulative_stats = cumulative_stats.reset_index()
+                # Calculer les cas particuliers pour ce match :
+
+                # 1. Adversaire en Force Buy, Zobrux en Full Buy, Zobrux a perdu
+                force_against_zobrux_lost = df_merged_team[
+                    (df_merged_team['team_clan_name'] == team) &
+                    (df_merged_team['round_category'] == 'Full buy round') &
+                    (df_merged_team['winner'] != df_merged_team['side']) &  # Zobrux a perdu
+                    (df_merged_team['round_category'].shift(-1) == 'Force buy round')  # Adversaire en Force Buy
+                ].shape[0]
+
+                # 2. Adversaire en Eco, Zobrux en Full Buy, Zobrux a perdu
+                eco_against_zobrux_lost = df_merged_team[
+                    (df_merged_team['team_clan_name'] == team) &
+                    (df_merged_team['round_category'] == 'Full buy round') &
+                    (df_merged_team['winner'] != df_merged_team['side']) &  # Zobrux a perdu
+                    (df_merged_team['round_category'].shift(-1) == 'Eco round')  # Adversaire en Eco
+                ].shape[0]
+
+                # 3. Zobrux en Eco, adversaire en Full Buy, Zobrux a gagné
+                zobrux_eco_against_full_win = df_merged_team[
+                    (df_merged_team['team_clan_name'] == team) &
+                    (df_merged_team['round_category'] == 'Eco round') &
+                    (df_merged_team['winner'] == df_merged_team['side']) &  # Zobrux a gagné
+                    (df_merged_team['round_category'].shift(1) == 'Full buy round')  # Adversaire en Full Buy
+                ].shape[0]
+
+                # 4. Zobrux en Force Buy, adversaire en Full Buy, Zobrux a gagné
+                zobrux_force_against_full_win = df_merged_team[
+                    (df_merged_team['team_clan_name'] == team) &
+                    (df_merged_team['round_category'] == 'Force buy round') &
+                    (df_merged_team['winner'] == df_merged_team['side']) &  # Zobrux a gagné
+                    (df_merged_team['round_category'].shift(1) == 'Full buy round')  # Adversaire en Full Buy
+                ].shape[0]
+
+                # Cumuler les résultats globaux
+                total_force_against_zobrux_lost += force_against_zobrux_lost
+                total_eco_against_zobrux_lost += eco_against_zobrux_lost
+                total_zobrux_eco_against_full_win += zobrux_eco_against_full_win
+                total_zobrux_force_against_full_win += zobrux_force_against_full_win
+
+            print(f"Nombre de fois où Zobrux en Full Buy a perdu contre Force Buy : {total_force_against_zobrux_lost}")
+            print(f"Nombre de fois où Zobrux en Full Buy a perdu contre Eco : {total_eco_against_zobrux_lost}")
+            print(f"Nombre de fois où Zobrux en Eco a gagné contre Full Buy : {total_zobrux_eco_against_full_win}")
+            print(f"Nombre de fois où Zobrux en Force Buy a gagné contre Full Buy : {total_zobrux_force_against_full_win}")
+
+            # Affichage des statistiques cumulées par catégorie et par side
+            cumulative_stats
+
+            ### test viz ###
+            
+            value = cumulative_stats.loc[3, 'win_%'] 
+            title_text = f"{cumulative_stats.loc[3, 'round_category']} - {cumulative_stats.loc[3, 'side']}"
+            gauge_color = "#fbac18"
+            min_val, max_val = 0, 100
+            angle_range = 270  
+            value_range = max_val - min_val
+            angle = value
+            fig, ax = plt.subplots(figsize=(3, 3), subplot_kw={'projection': 'polar'})
+            ax.barh(1, np.radians(angle_range), left=np.radians(225), color=gauge_color, height=0.3)
+            ax.barh(1, np.radians(angle), left=np.radians(225), color="lightgray", height=0.3)
+            ax.text(0, 0, f"{value:.1f}%", ha='center', va='center',fontsize=18, color="white")
+            ax.set_title(title_text, color = 'white',fontsize=14, pad=20)
+            ax.set_yticklabels([])
+            ax.set_xticklabels([])
+            ax.set_yticks([])
+            ax.set_xticks([])
+            ax.spines.clear()
+            fig.patch.set_alpha(0)  
+            ax.patch.set_alpha(0)  
+            ax.set_theta_offset(np.pi / 2)
+
             ### calculs des indicateurs joueurs ###
 
             #### Definition des joueurs
@@ -353,6 +503,9 @@ def analyze():
             all_players_stats_grouped = all_players_stats_grouped[nouvel_ordre_colonnes]
 
 
+
+
+
 #### Pages architecture #### 
 
 def hide_all():
@@ -360,7 +513,6 @@ def hide_all():
     home_page.hide()
     page_team_summary.hide()
     page_team_details.hide()
-    page_match_analysis.hide()
 
 def show_home_page():
     home_page.show()
@@ -370,9 +522,6 @@ def show_team_summary():
 
 def show_team_details():
     page_team_details.show()
-
-def show_match_analysis():
-    page_match_analysis.show()
 
 #### Classe des différentes pages ####
 
@@ -404,6 +553,7 @@ class HomePage:
         self.button_1.pack(pady=30, padx=10)
         self.entry_1.pack(pady=25, padx=10)
         self.button_2.pack(pady=25, padx=10)
+        self.frame.update_idletasks()
 
     def hide(self):
         self.frame.pack_forget()
@@ -418,10 +568,57 @@ class TeamSummaryPage:
         self.frame.pack(pady=20, padx=20, fill="both", expand=True)
         self.label.pack(pady=50)
 
-        # Afficher des données fictives en attendant les vraies données
-        if all_players_stats_grouped is not None:
-            summary_label = CTkLabel(master=self.frame, text="Team Summary Data", font=('Stratum2 Bd', 14))
-            summary_label.pack(pady=10)
+        self.frame.update_idletasks()
+
+        # Vérifier si les données existent avant de générer le graphique
+        if cumulative_stats is not None:
+            try:
+                # Données pour le graphique de jauge
+                value = cumulative_stats.loc[3, 'win_%']  # Par exemple 75
+                title_text = f"{cumulative_stats.loc[3, 'round_category']} - {cumulative_stats.loc[3, 'side']}"
+                gauge_color = "#fbac18"
+
+                # Paramètres de la jauge
+                min_val, max_val = 0, 100
+                angle_range = 270  # Plage d'angle pour la jauge (3/4 de cercle)
+                value_range = max_val - min_val
+                angle = value
+
+                # Création de la figure et de l'axe polaire
+                fig, ax = plt.subplots(figsize=(3, 3), subplot_kw={'projection': 'polar'})
+
+                # Remplissage de la jauge en gris pour le fond
+                ax.barh(1, np.radians(angle_range), left=np.radians(225), color=gauge_color, height=0.3)
+
+                # Remplissage de la jauge jusqu'à la valeur
+                ax.barh(1, np.radians(angle), left=np.radians(225), color="lightgray", height=0.3)
+
+                # Affichage du pourcentage au centre
+                ax.text(0, 0, f"{value:.1f}%", ha='center', va='center', fontsize=18, color="white")
+
+                # Affichage du titre avec ax.set_title() plutôt que plt.title()
+                ax.set_title(title_text, color='white', fontsize=14, pad=20)
+
+                # Suppression des marques et des étiquettes pour une apparence propre
+                ax.set_yticklabels([])
+                ax.set_xticklabels([])
+                ax.set_yticks([])
+                ax.set_xticks([])
+                ax.spines.clear()
+
+                fig.patch.set_alpha(0)  # Fond transparent pour la figure
+                ax.patch.set_alpha(0)   # Fond transparent pour l'axe (cercle)
+                # Fixer l'angle de rotation pour avoir la jauge alignée verticalement
+                ax.set_theta_offset(np.pi / 2)
+
+                # Intégrer la figure matplotlib dans tkinter via FigureCanvasTkAgg
+                canvas = FigureCanvasTkAgg(fig, master=self.frame)  # Intégrer dans la frame
+                canvas.draw() 
+                canvas.get_tk_widget().config(bg="#212121", highlightthickness=0) 
+                canvas.get_tk_widget().pack(pady=20)  # Afficher le graphique dans tkinter
+            except Exception as e:
+                error_label = CTkLabel(master=self.frame, text=f"Error generating chart: {e}", font=('Stratum2 Bd', 14))
+                error_label.pack(pady=10)
         else:
             error_label = CTkLabel(master=self.frame, text="No data available. Please run the analysis first.", font=('Stratum2 Bd', 16))
             error_label.pack(pady=10)
@@ -429,15 +626,16 @@ class TeamSummaryPage:
     def hide(self):
         self.frame.pack_forget()
 
-class TeamDetailsPage:
+class PlayerDetailsPage:
     def __init__(self):
         self.frame = CTkFrame(master=app)
-        self.label = CTkLabel(master=self.frame, text="Team Detailed Performances", font=('Stratum2 Bd', 20))
+        self.label = CTkLabel(master=self.frame, text="Players Detailed Performances", font=('Stratum2 Bd', 20))
 
     def show(self):
         hide_all()
         self.frame.pack(pady=20, padx=20, fill="both", expand=True)
         self.label.pack(pady=50)
+        self.frame.update_idletasks()
 
         if all_players_stats_grouped is not None:
             table_frame = CTkFrame(self.frame)
@@ -454,24 +652,11 @@ class TeamDetailsPage:
     def hide(self):
         self.frame.pack_forget()
 
-class MatchAnalysisPage:
-    def __init__(self):
-        self.frame = CTkFrame(master=app)
-        self.label = CTkLabel(master=self.frame, text="Specific Match Analysis", font=('Stratum2 Bd', 20))
-
-    def show(self):
-        hide_all()
-        self.frame.pack(pady=20, padx=20, fill="both", expand=True)
-        self.label.pack(pady=50)
-
-    def hide(self):
-        self.frame.pack_forget()
 
 #### Création des pages ####
 home_page = HomePage()
 page_team_summary = TeamSummaryPage()
-page_team_details = TeamDetailsPage()
-page_match_analysis = MatchAnalysisPage()
+page_team_details = PlayerDetailsPage()
 
 #### Header ####
 frame_header = CTkFrame(master=app)
@@ -493,10 +678,8 @@ button_team_summary.grid(row=0, column=1, padx=20)
 button_team_details = CTkButton(master=button_frame, text='Team Detailed Performances', font=('Stratum2 Bd', 20), command=show_team_details)
 button_team_details.grid(row=0, column=2, padx=20)
 
-button_match_analysis = CTkButton(master=button_frame, text='Specific Match Analysis', font=('Stratum2 Bd', 20), command=show_match_analysis)
-button_match_analysis.grid(row=0, column=3, padx=20)
 
 #### Affichage initial de la page d'accueil ####
 home_page.show()
-
+app.protocol("WM_DELETE_WINDOW", app.quit)
 app.mainloop()
