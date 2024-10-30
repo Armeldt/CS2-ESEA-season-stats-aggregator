@@ -86,13 +86,13 @@ class TeamSummaryPage(ctk.CTk):
         # Configure grid for the frame_left (columns 1 and 2 combined)
         frame_left.grid_columnconfigure((0, 1), weight=1)  # Two columns inside the frame_left
         frame_left.grid_rowconfigure(0, weight=1)
-        frame_left.grid_rowconfigure((1,2,3,4), weight=3)
+        frame_left.grid_rowconfigure((1,2,3,4,5), weight=3)
 
         # Configure grid for the frame_left (columns 1 and 2 combined)
         
         frame_record = ctk.CTkFrame(frame_left, corner_radius=20,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
         frame_record.grid_columnconfigure((0, 1, 2), weight=1)
-        frame_record.grid(row=0, column=0, columnspan=2, pady=(0,10), sticky="nsew")
+        frame_record.grid(row=0, column=0, columnspan=2, pady=(10,10), sticky="nsew")
 
         label_team_name = ctk.CTkLabel(frame_record, text="Zobrux",text_color='white', font=("Stratum2 Bd", 36))
         label_team_name.grid(row=0, column=0, sticky="nsew",padx=20, pady=20)
@@ -105,7 +105,7 @@ class TeamSummaryPage(ctk.CTk):
 
         #bg maps
         self.frame_bg_maps = ctk.CTkFrame(frame_left, fg_color='#8D8DB9', corner_radius=20,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
-        self.frame_bg_maps.grid(row=1, column=0, columnspan=3,rowspan=4, sticky="nsew", pady=(10,0))
+        self.frame_bg_maps.grid(row=1, column=0, columnspan=3,rowspan=5, sticky="nsew", pady=(10,0))
 
         #Sous-titre (Titre de la sous-catégorie) avec fond bleu
         self.frame_subtitle = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20,bg_color='transparent',background_corner_colors=('#1a1a1a','#1a1a1a','#8D8DB9','#8D8DB9'))
@@ -121,53 +121,61 @@ class TeamSummaryPage(ctk.CTk):
         self.dust2_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/dust2.jpg'), 30), size=(200,100))
         self.anubis_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/anubis.png'), 30), size=(200,100))
         self.vertigo_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/vertigo.png'), 30), size=(200,100))
-
+        self.inferno_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/inferno.png'), 30), size=(200,100))
+        
         # Créer un frame avec un fond bleu et une largeur fixée à celle de l'image
         self.frame_map_1 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20,width=250, height=180, background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
-        self.frame_map_1.grid(row=2, column=0, padx=(10,0), pady=(30,5), sticky="n")
+        self.frame_map_1.grid(row=2, column=0, padx=(10,0), pady=(15,5), sticky="n")
         self.label_map_1 = ctk.CTkLabel(self.frame_map_1, text="", image=self.ancient_img)
         self.label_map_1.pack(side="top")
-        self.label_map_text_1 = ctk.CTkLabel(self.frame_map_1, text="3 wins 4 losses\nWin rate 40%", text_color='white', font=("Montserrat", 14))
-        self.label_map_text_1.pack(side="top", pady=(5, 5))
+        self.label_map_text_1 = ctk.CTkLabel(self.frame_map_1, text="3 wins 4 losses\nWin rate 40%", text_color='white', font=("Montserrat", 12))
+        self.label_map_text_1.pack(side="top", pady=(3, 3))
 
         self.frame_map_2 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
-        self.frame_map_2.grid(row=2, column=1, padx=(0,10), pady=(30,5), sticky="n")
+        self.frame_map_2.grid(row=2, column=1, padx=(0,10), pady=(15,5), sticky="n")
         self.label_map_2 = ctk.CTkLabel(self.frame_map_2, text="", image=self.mirage_img)
         self.label_map_2.pack(side="top")
-        self.label_map_text_2 = ctk.CTkLabel(self.frame_map_2, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 14))
-        self.label_map_text_2.pack(side="top", pady=(5, 5))
+        self.label_map_text_2 = ctk.CTkLabel(self.frame_map_2, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 12))
+        self.label_map_text_2.pack(side="top", pady=(3, 3))
 
         self.frame_map_3 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
-        self.frame_map_3.grid(row=3, column=0, padx=(10,0), pady=15, sticky="n")
+        self.frame_map_3.grid(row=3, column=0, padx=(10,0), pady=10, sticky="n")
         self.label_map_3 = ctk.CTkLabel(self.frame_map_3, text="", image=self.nuke_img)
         self.label_map_3.pack(side="top")
-        self.label_map_text_3 = ctk.CTkLabel(self.frame_map_3, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 14))
-        self.label_map_text_3.pack(side="top", pady=(5, 5))
+        self.label_map_text_3 = ctk.CTkLabel(self.frame_map_3, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 12))
+        self.label_map_text_3.pack(side="top", pady=(3, 3))
 
         self.frame_map_4 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
-        self.frame_map_4.grid(row=3, column=1, padx=(0,10), pady=15, sticky="n")
+        self.frame_map_4.grid(row=3, column=1, padx=(0,10), pady=10, sticky="n")
         self.label_map_4 = ctk.CTkLabel(self.frame_map_4, text="", image=self.dust2_img)
         self.label_map_4.pack(side="top")
-        self.label_map_text_4 = ctk.CTkLabel(self.frame_map_4, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 14))
-        self.label_map_text_4.pack(side="top", pady=(5, 5))
+        self.label_map_text_4 = ctk.CTkLabel(self.frame_map_4, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 12))
+        self.label_map_text_4.pack(side="top", pady=(3, 3))
 
         self.frame_map_5 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
-        self.frame_map_5.grid(row=4, column=0, padx=(10,0), pady=(5,30), sticky="n")
+        self.frame_map_5.grid(row=4, column=0, padx=(10,0), pady=(5,10), sticky="n")
         self.label_map_5 = ctk.CTkLabel(self.frame_map_5, text="", image=self.anubis_img)
         self.label_map_5.pack(side="top")
-        self.label_map_text_5 = ctk.CTkLabel(self.frame_map_5, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 14))
-        self.label_map_text_5.pack(side="top", pady=(5, 5))
+        self.label_map_text_5 = ctk.CTkLabel(self.frame_map_5, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 12))
+        self.label_map_text_5.pack(side="top", pady=(3, 3))
 
         self.frame_map_6 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
-        self.frame_map_6.grid(row=4, column=1, padx=(0,10), pady=(5,30), sticky="n")
+        self.frame_map_6.grid(row=4, column=1, padx=(0,10), pady=(5,10), sticky="n")
         self.label_map_6 = ctk.CTkLabel(self.frame_map_6, text="", image=self.vertigo_img)
         self.label_map_6.pack(side="top")
-        self.label_map_text_6 = ctk.CTkLabel(self.frame_map_6, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 14))
-        self.label_map_text_6.pack(side="top", pady=(5, 5))
+        self.label_map_text_6 = ctk.CTkLabel(self.frame_map_6, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 12))
+        self.label_map_text_6.pack(side="top", pady=(3, 3))
+
+        self.frame_map_7 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_7.grid(row=5, column=0, columnspan=2, padx=(0,10), pady=(5,15), sticky="n")
+        self.label_map_7 = ctk.CTkLabel(self.frame_map_7, text="", image=self.inferno_img)
+        self.label_map_7.pack(side="top")
+        self.label_map_text_7 = ctk.CTkLabel(self.frame_map_7, text="3 wins 4 losses\nWin rate 40%", fg_color=None, text_color='white', font=("Montserrat", 12))
+        self.label_map_text_7.pack(side="top", pady=(3, 3))
 
         #### Second frame for the right side ####
         frame_right_top = ctk.CTkFrame(self, corner_radius=20)
-        frame_right_top.grid(row=1, column=1, padx=(10,20), pady=(10,20), sticky="nsew")  # Second frame on right
+        frame_right_top.grid(row=1, column=1, padx=(10,20), pady=(20,20), sticky="nsew")  # Second frame on right
 
         # Configure grid for the frame_right_top (columns 1 and 2 combined)
         frame_right_top.grid_columnconfigure((0, 1, 2), weight=1)
