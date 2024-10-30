@@ -36,7 +36,6 @@ instructions_text = (
                 "6. Navigate through the pages to see how you performed individually and as a team")
 
 
-
 def get_team_name(event=None): 
     global team_name 
     team_name = HomePage.entry_1.get()  # Accéder à l'entrée pour obtenir le texte
@@ -138,7 +137,7 @@ class HomePage(ctk.CTk):
         label_wam.pack(side='bottom')
         # label_wam.grid(row=0,column=0, pady=20,sticky="new")
 
-        logo = ctk.CTkImage(dark_image=Image.open('Assets/Maps/ancient.png'), size=(200,100))
+        #logo = ctk.CTkImage(dark_image=Image.open('Assets/Maps/ancient.png'), size=(200,100))
 
 
 
