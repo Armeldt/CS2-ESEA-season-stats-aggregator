@@ -437,11 +437,6 @@ def analyze():
                 total_zobrux_eco_against_full_win += zobrux_eco_against_full_win
                 total_zobrux_force_against_full_win += zobrux_force_against_full_win
 
-            print(f"Nombre de fois où Zobrux en Full Buy a perdu contre Force Buy : {total_force_against_zobrux_lost}")
-            print(f"Nombre de fois où Zobrux en Full Buy a perdu contre Eco : {total_eco_against_zobrux_lost}")
-            print(f"Nombre de fois où Zobrux en Eco a gagné contre Full Buy : {total_zobrux_eco_against_full_win}")
-            print(f"Nombre de fois où Zobrux en Force Buy a gagné contre Full Buy : {total_zobrux_force_against_full_win}")
-
             # Affichage des statistiques cumulées par catégorie et par side
             cumulative_stats
 
