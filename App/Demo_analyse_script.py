@@ -440,28 +440,7 @@ def analyze():
             # Affichage des statistiques cumulées par catégorie et par side
             cumulative_stats
 
-            ### test viz ###
-            
-            value = cumulative_stats.loc[3, 'win_%'] 
-            title_text = f"{cumulative_stats.loc[3, 'round_category']} - {cumulative_stats.loc[3, 'side']}"
-            gauge_color = "#fbac18"
-            min_val, max_val = 0, 100
-            angle_range = 270  
-            value_range = max_val - min_val
-            angle = value
-            fig, ax = plt.subplots(figsize=(3, 3), subplot_kw={'projection': 'polar'})
-            ax.barh(1, np.radians(angle_range), left=np.radians(225), color=gauge_color, height=0.3)
-            ax.barh(1, np.radians(angle), left=np.radians(225), color="lightgray", height=0.3)
-            ax.text(0, 0, f"{value:.1f}%", ha='center', va='center',fontsize=18, color="white")
-            ax.set_title(title_text, color = 'white',fontsize=14, pad=20)
-            ax.set_yticklabels([])
-            ax.set_xticklabels([])
-            ax.set_yticks([])
-            ax.set_xticks([])
-            ax.spines.clear()
-            fig.patch.set_alpha(0)  
-            ax.patch.set_alpha(0)  
-            ax.set_theta_offset(np.pi / 2)
+           
 
             ### calculs des indicateurs joueurs ###
 
