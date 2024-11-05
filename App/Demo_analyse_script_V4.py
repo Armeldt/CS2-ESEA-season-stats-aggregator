@@ -279,7 +279,6 @@ def calculate_trading_stats(joueurs, all_matches):
     # Création des DataFrames pour les statistiques
     traded_deaths_df_global = pd.DataFrame(traded_deaths_global)
     trade_kills_df_global = pd.DataFrame(trade_kills_global)
-    print(traded_deaths_global)
     # Comptage des traded deaths et trade kills
     traded_deaths_count_global = traded_deaths_df_global.groupby(['player', 'side_user']).size().unstack(fill_value=0).reset_index()
     trade_kills_count_global = trade_kills_df_global.groupby(['player', 'side_user']).size().unstack(fill_value=0).reset_index()
@@ -488,14 +487,17 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
     }
     return results
 
+# results = cumulate_stats()
+# print("Map Stats:\n", results['map_stats'])
+# print("Win Rate per Round Type:\n", results['wr_per_round_type'])
+# print("Utility Stats:\n", results['util_stats'])
+# print("Player Stats:\n", results['player_stats'])
+# print("Entry Stats:\n", results['entry_stats'])
+# print("Eco Kills:\n", results['eco_kills'])
+# print("Advanced Stats:\n", results['advanced_stats'])
+# print("Trading Stats:\n", results['trading_stats'])
 
-
-results = cumulate_stats()
-print("Map Stats:\n", results['map_stats'])
-print("Win Rate per Round Type:\n", results['wr_per_round_type'])
-print("Utility Stats:\n", results['util_stats'])
-print("Player Stats:\n", results['player_stats'])
-print("Entry Stats:\n", results['entry_stats'])
-print("Eco Kills:\n", results['eco_kills'])
-print("Advanced Stats:\n", results['advanced_stats'])
-print("Trading Stats:\n", results['trading_stats'])
+def run_analysis(team_name, file_paths):
+    # Appelle cumulate_stats avec les paramètres fournis
+    results = cumulate_stats(team_name=team_name, file_paths=file_paths)
+    return results
