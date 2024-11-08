@@ -80,7 +80,7 @@ class TeamSummaryPage(ctk.CTkFrame):
 
 
         #### Frame for Columns 1 and 2 ####
-        frame_left = ctk.CTkFrame(self, corner_radius=20,fg_color='#1a1a1a')
+        frame_left = ctk.CTkFrame(self, corner_radius=20,fg_color='transparent')
         frame_left.grid(row=1, column=0, rowspan=3, padx=(20,10), pady=(10,20), sticky="nsew")  # First large frame on left
 
         # Configure grid for the frame_left (columns 1 and 2 combined)
@@ -90,7 +90,7 @@ class TeamSummaryPage(ctk.CTkFrame):
 
         # Configure grid for the frame_left (columns 1 and 2 combined)
         
-        frame_record = ctk.CTkFrame(frame_left, corner_radius=20,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
+        frame_record = ctk.CTkFrame(frame_left, corner_radius=20,fg_color='#1a1a1a')#background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
         frame_record.grid_columnconfigure((0, 1, 2), weight=1)
         frame_record.grid(row=0, column=0, columnspan=2, pady=(10,10), sticky="nsew")
 
@@ -104,11 +104,11 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.label_team_record_losses.grid(row=0, column=2, sticky="nsew",padx=20, pady=20)
 
         #bg maps
-        self.frame_bg_maps = ctk.CTkFrame(frame_left, fg_color='#8D8DB9', corner_radius=20,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
+        self.frame_bg_maps = ctk.CTkFrame(frame_left, fg_color='#8D8DB9', corner_radius=20)#,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
         self.frame_bg_maps.grid(row=1, column=0, columnspan=3,rowspan=5, sticky="nsew", pady=(10,0))
 
         #Sous-titre (Titre de la sous-catégorie) avec fond bleu
-        self.frame_subtitle = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20,bg_color='transparent',background_corner_colors=('#1a1a1a','#1a1a1a','#8D8DB9','#8D8DB9'))
+        self.frame_subtitle = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20,bg_color='transparent',background_corner_colors=('','','#8D8DB9','#8D8DB9'))
         self.frame_subtitle.grid(row=1, column=0, columnspan=3, sticky="nsew",pady=(10,0))
         # Label sous-titre centré avec pack
         self.label_subtitle = ctk.CTkLabel(self.frame_subtitle, text='Winrate by maps', font=("Stratum2 Bd", 28), text_color='white')
@@ -174,7 +174,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.label_map_text_7.pack(side="top", pady=(3, 3))
 
         #### Second frame for the right side ####
-        frame_right_top = ctk.CTkFrame(self, corner_radius=20)
+        frame_right_top = ctk.CTkFrame(self, corner_radius=20,fg_color='transparent')
         frame_right_top.grid(row=1, column=1, padx=(10,20), pady=(20,20), sticky="nsew")  # Second frame on right
 
         # Configure grid for the frame_right_top (columns 1 and 2 combined)
@@ -183,10 +183,10 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_right_top.grid_rowconfigure(1, weight=10)
         frame_right_top.grid_rowconfigure(2, weight=1)
 
-        frame_rounds_type_data_frame = ctk.CTkFrame(frame_right_top, fg_color='#8D8DB9', corner_radius=20,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
+        frame_rounds_type_data_frame = ctk.CTkFrame(frame_right_top, fg_color='#8D8DB9', corner_radius=20)
         frame_rounds_type_data_frame.grid(row=0,column=0, columnspan=3,rowspan=3,sticky='nsew')
 
-        frame_rounds_type_title = ctk.CTkFrame(frame_right_top, fg_color='#28397F', corner_radius=20,background_corner_colors=('#1a1a1a','#8D8DB9','#8D8DB9','#8D8DB9'))
+        frame_rounds_type_title = ctk.CTkFrame(frame_right_top, fg_color='#28397F', corner_radius=20,background_corner_colors=('','#8D8DB9','#8D8DB9','#8D8DB9'))
         frame_rounds_type_title.grid(row=0,column=0,columnspan=2,sticky="nw")
 
         rounds_type_title = ctk.CTkLabel(frame_rounds_type_title,text="Win rate by round type", font=("Stratum2 Bd", 28), text_color='white')
@@ -228,7 +228,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         viz_1_title.grid(row=0, column=0,columnspan=2,sticky="nsew")
         
         ###frame top###
-        frame_top_3rd_row = ctk.CTkFrame(frame_right_top, corner_radius=20,fg_color='#8D8DB9',background_corner_colors=('#8D8DB9','#8D8DB9','#1a1a1a','#1a1a1a'))
+        frame_top_3rd_row = ctk.CTkFrame(frame_right_top, corner_radius=20,fg_color='#8D8DB9',background_corner_colors=('#8D8DB9','#8D8DB9','',''))
         frame_top_3rd_row.grid_columnconfigure((0,1,2,3), weight=1)
         frame_top_3rd_row.grid(row=2, column=0,columnspan=4, sticky="nsew")
 
@@ -236,28 +236,28 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_fb_vs_eco.grid_rowconfigure((0,1),weight=1)
         frame_fb_vs_eco.grid_columnconfigure(1,weight=1)
         frame_fb_vs_eco.grid(row=0,column=0,padx=(20,10), pady=5, sticky="nsew")
-        label_fb_vs_eco = ctk.CTkLabel(frame_fb_vs_eco,text="Full buy VS eco losts", font=("Montserrat", 14), text_color='white')
+        label_fb_vs_eco = ctk.CTkLabel(frame_fb_vs_eco,text="Full buy losts against eco", font=("Montserrat", 14), text_color='white')
         label_fb_vs_eco.grid(row=0,column=1,padx=10, pady=(20,5), sticky="nsew")
-        value_fb_vs_eco = ctk.CTkLabel(frame_fb_vs_eco,text="1", font=("Stratum2 Bd", 28), text_color='white')
-        value_fb_vs_eco.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
+        self.value_fb_vs_eco = ctk.CTkLabel(frame_fb_vs_eco,text="", font=("Stratum2 Bd", 28), text_color='white')
+        self.value_fb_vs_eco.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
 
         frame_fb_vs_force = ctk.CTkFrame(frame_top_3rd_row, corner_radius=20,fg_color='#28397F')
         frame_fb_vs_force.grid_rowconfigure((0,1),weight=1)
         frame_fb_vs_force.grid_columnconfigure(1,weight=1)
         frame_fb_vs_force.grid(row=0,column=1,padx=10, pady=5, sticky="nsew")
-        label_fb_vs_force = ctk.CTkLabel(frame_fb_vs_force,text="Full buy VS force buy losts", font=("Montserrat", 14), text_color='white')
+        label_fb_vs_force = ctk.CTkLabel(frame_fb_vs_force,text="Full buy losts against force buy ", font=("Montserrat", 14), text_color='white')
         label_fb_vs_force.grid(row=0,column=1,padx=10, pady=(20,5), sticky="nsew")
-        value_fb_vs_force = ctk.CTkLabel(frame_fb_vs_force,text="4", font=("Stratum2 Bd", 28), text_color='white')
-        value_fb_vs_force.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
+        self.value_fb_vs_force = ctk.CTkLabel(frame_fb_vs_force,text="", font=("Stratum2 Bd", 28), text_color='white')
+        self.value_fb_vs_force.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
 
         frame_eco_vs_fb = ctk.CTkFrame(frame_top_3rd_row, corner_radius=20,fg_color='#28397F')
         frame_eco_vs_fb.grid_rowconfigure((0,1),weight=1)
         frame_eco_vs_fb.grid_columnconfigure(1,weight=1)
         frame_eco_vs_fb.grid(row=0,column=2,padx=10, pady=5, sticky="nsew")
-        label_eco_vs_fb = ctk.CTkLabel(frame_eco_vs_fb,text="Eco vs Full buy won", font=("Montserrat", 14), text_color='white')
+        label_eco_vs_fb = ctk.CTkLabel(frame_eco_vs_fb,text="Eco won against full buy", font=("Montserrat", 14), text_color='white')
         label_eco_vs_fb.grid(row=0,column=1,padx=10, pady=(20,5), sticky="nsew")
-        value_eco_vs_fb = ctk.CTkLabel(frame_eco_vs_fb,text="1", font=("Stratum2 Bd", 28), text_color='white')
-        value_eco_vs_fb.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
+        self.value_eco_vs_fb = ctk.CTkLabel(frame_eco_vs_fb,text="", font=("Stratum2 Bd", 28), text_color='white')
+        self.value_eco_vs_fb.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
                              
         
 
@@ -265,10 +265,10 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_force_vs_fb.grid_rowconfigure((0,1),weight=1)
         frame_force_vs_fb.grid_columnconfigure(1,weight=1)
         frame_force_vs_fb.grid(row=0,column=3,padx=(10,20), pady=5, sticky="nsew")
-        label_force_vs_fb = ctk.CTkLabel(frame_force_vs_fb,text="Force buy vs Full buy won", font=("Montserrat", 14), text_color='white')
+        label_force_vs_fb = ctk.CTkLabel(frame_force_vs_fb,text="Force buy won against full buy", font=("Montserrat", 14), text_color='white')
         label_force_vs_fb.grid(row=0,column=1,padx=10, pady=(20,5), sticky="nsew")
-        value_force_vs_fb = ctk.CTkLabel(frame_force_vs_fb,text="2", font=("Stratum2 Bd", 28), text_color='white')
-        value_force_vs_fb.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
+        self.value_force_vs_fb = ctk.CTkLabel(frame_force_vs_fb,text="", font=("Stratum2 Bd", 28), text_color='white')
+        self.value_force_vs_fb.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
 
         
 
@@ -286,8 +286,8 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_closest_win.grid(row=0,column=0,padx=(20,10), pady=(20,10), sticky="nsew")
         closest_win_label = ctk.CTkLabel(frame_closest_win,text="Closest win :", font=("Montserrat", 14), text_color='white')
         closest_win_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
-        closest_win_label = ctk.CTkLabel(frame_closest_win,text="19-17 VS Edjelsar", font=("Stratum2 Bd", 20), text_color='white')
-        closest_win_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
+        self.closest_win_value = ctk.CTkLabel(frame_closest_win,text="", font=("Stratum2 Bd", 20), text_color='white')
+        self.closest_win_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
 
         frame_largest_win = ctk.CTkFrame(frame_right_bot, corner_radius=20 ,fg_color='#28397F')
@@ -297,8 +297,8 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_largest_win.grid(row=0,column=1,padx=(10,10), pady=(20,10), sticky="nsew")
         largest_win_label = ctk.CTkLabel(frame_largest_win,text="Largest win :", font=("Montserrat", 14), text_color='white')
         largest_win_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
-        largest_win_label = ctk.CTkLabel(frame_largest_win,text="13-1 VS MadeInPoland", font=("Stratum2 Bd", 20), text_color='white')
-        largest_win_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
+        self.largest_win_value = ctk.CTkLabel(frame_largest_win,text="", font=("Stratum2 Bd", 20), text_color='white')
+        self.largest_win_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
     
         frame_longest_winstreak = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
@@ -308,19 +308,19 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_longest_winstreak.grid_rowconfigure(0,weight=1)
         longest_winstreak_label = ctk.CTkLabel(frame_longest_winstreak,text="Longest winstreak :", font=("Montserrat", 14), text_color='white')
         longest_winstreak_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
-        longest_winstreak_label = ctk.CTkLabel(frame_longest_winstreak,text="6 wins", font=("Stratum2 Bd", 20), text_color='white')
-        longest_winstreak_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
+        self.longest_winstreak_value = ctk.CTkLabel(frame_longest_winstreak,text="", font=("Stratum2 Bd", 20), text_color='white')
+        self.longest_winstreak_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
 
-        define1_frame = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
-        define1_frame.grid(row=1,column=0,padx=(20,10), pady=(10,20), sticky="nsew")
-        define1_frame.grid_columnconfigure(0,weight=1)
-        define1_frame.grid_columnconfigure(1,weight=3)
-        define1_frame.grid_rowconfigure(0,weight=1)
-        define_1_label = ctk.CTkLabel(define1_frame,text="KPI a définir :", font=("Montserrat", 14), text_color='white')
-        define_1_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
-        define_1_label = ctk.CTkLabel(define1_frame,text="valeur", font=("Stratum2 Bd", 20), text_color='white')
-        define_1_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
+        total_rounds_played_frame = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
+        total_rounds_played_frame.grid(row=1,column=0,padx=(20,10), pady=(10,20), sticky="nsew")
+        total_rounds_played_frame.grid_columnconfigure(0,weight=1)
+        total_rounds_played_frame.grid_columnconfigure(1,weight=3)
+        total_rounds_played_frame.grid_rowconfigure(0,weight=1)
+        total_rounds_played_label = ctk.CTkLabel(total_rounds_played_frame,text="Total rounds played :", font=("Montserrat", 14), text_color='white')
+        total_rounds_played_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
+        self.total_rounds_played_value = ctk.CTkLabel(total_rounds_played_frame,text="", font=("Stratum2 Bd", 20), text_color='white')
+        self.total_rounds_played_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
         define2_frame = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
         define2_frame.grid(row=1,column=1,padx=(10,10), pady=(10,20), sticky="nsew")
@@ -343,20 +343,47 @@ class TeamSummaryPage(ctk.CTkFrame):
         define_3_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
     
     def update_data(self, analysis_results):
-        print("update_data called with analysis_results:", analysis_results)
         # Vérifiez que les résultats d'analyse contiennent les données nécessaires
         if analysis_results:
-            # Mettre à jour le nom de l'équipe, les victoires et les défaites
+            # Chargement des données depuis le script d'analyse
             team_name = self.master.team_name if hasattr(self.master, 'team_name') else "Unknown Team"
             own_team_wins = analysis_results.get("own_team_wins", 0)
             own_team_losses = analysis_results.get("own_team_losses", 0)
+            special_round_type = analysis_results.get("special_round_type")
+            map_stats = analysis_results.get("map_stats")
+            round_stats = analysis_results.get("wr_per_round_type",pd.DataFrame())
+            detailed_match_results = analysis_results.get("detailed_match_results")
+            winstreak = analysis_results.get("winstreak")
 
-            # Utilisez configure pour mettre à jour les widgets
+            # mise a jour des widgets
             self.label_team_name.configure(text=team_name)
             self.label_team_record_wins.configure(text=f"{own_team_wins} Wins")
             self.label_team_record_losses.configure(text=f"{own_team_losses} Losses")
 
-            map_stats = analysis_results.get("map_stats")
+            self.value_fb_vs_eco.configure(text=special_round_type['count'][1])
+            self.value_fb_vs_force.configure(text=special_round_type['count'][0])
+            self.value_eco_vs_fb.configure(text=special_round_type['count'][2])
+            self.value_force_vs_fb.configure(text=special_round_type['count'][3])
+
+            # Victoire la plus large
+            if detailed_match_results["largest_win"]:
+                self.largest_win_value.configure(
+                    text=f"{detailed_match_results['largest_win']['game_name']} {detailed_match_results['largest_win']['team_score']} - {detailed_match_results['largest_win']['opponent_score']}"
+                )
+            else:
+                self.largest_win_value.configure(text="Aucune victoire enregistrée.")
+
+            # Victoire la plus serrée
+            if detailed_match_results["closest_win"]:
+                self.closest_win_value.configure(
+                    text=f"{detailed_match_results['closest_win']['game_name']} {detailed_match_results['closest_win']['team_score']} - {detailed_match_results['closest_win']['opponent_score']}"
+                )
+            else:
+                self.closest_win_value.configure(text="Aucune victoire enregistrée.")
+
+            self.longest_winstreak_value.configure(text=winstreak)
+
+            self.total_rounds_played_value.configure(text=round_stats['total_rounds'].sum())
         
             if not map_stats.empty:
                 # Exemple pour afficher les stats de de_anubis
@@ -402,19 +429,16 @@ class TeamSummaryPage(ctk.CTkFrame):
                 else:
                     self.label_map_text_7.configure(text="Map not played")
 
-            round_stats = analysis_results.get("wr_per_round_type",pd.DataFrame())
-
+            
             if not round_stats.empty:
                 # Pistol Round CT
                 pistol_ct = round_stats[(round_stats['round_category'] == 'Pistol round') & (round_stats['side'] == 'CT')]
                 winrate_pistol_ct = int(pistol_ct['win_%'].values[0]) if not pistol_ct.empty else 0
-                print("Updating CT - Pistol with win rate:", winrate_pistol_ct)
                 update_gauge_chart(self.frame_round_type_viz_pistol, winrate_pistol_ct, "CT - Pistol", "#28397f", row=1, column=0)
 
                 # Pistol Round Terrorist
-                pistol_terrorist = round_stats[(round_stats['round_category'] == 'Pistol round') & (round_stats['side'] == 'TERRORIST')]
+                pistol_terrorist = round_stats[(round_stats['round_category'] == 'Pistol round') & (round_stats['side'] == 'T')]
                 winrate_pistol_terrorist = int(pistol_terrorist['win_%'].values[0]) if not pistol_terrorist.empty else 0
-                print("Updating T - Pistol with win rate:", winrate_pistol_terrorist)
                 update_gauge_chart(self.frame_round_type_viz_pistol, winrate_pistol_terrorist, "Terrorist - Pistol", "#fbac18", row=1, column=1)
 
                 # Full Buy Round CT
@@ -423,7 +447,7 @@ class TeamSummaryPage(ctk.CTkFrame):
                 update_gauge_chart(self.frame_round_type_viz_fullbuy, winrate_fullbuy_ct, "CT - Full Buy", "#28397f",row=1, column=0)
 
                 # Full Buy Round Terrorist
-                fullbuy_terrorist = round_stats[(round_stats['round_category'] == 'Full buy round') & (round_stats['side'] == 'TERRORIST')]
+                fullbuy_terrorist = round_stats[(round_stats['round_category'] == 'Full buy round') & (round_stats['side'] == 'T')]
                 winrate_fullbuy_terrorist = int(fullbuy_terrorist['win_%'].values[0]) if not fullbuy_terrorist.empty else 0
                 update_gauge_chart(self.frame_round_type_viz_fullbuy, winrate_fullbuy_terrorist, "Terrorist - Full Buy", "#fbac18", row=1, column=1)
 
@@ -433,7 +457,7 @@ class TeamSummaryPage(ctk.CTkFrame):
                 update_gauge_chart(self.frame_round_type_viz_forcebuy, winrate_forcebuy_ct, "CT - Force Buy", "#28397f",row=1, column=0)
 
                 # Force Buy Round Terrorist
-                forcebuy_terrorist = round_stats[(round_stats['round_category'] == 'Force buy round') & (round_stats['side'] == 'TERRORIST')]
+                forcebuy_terrorist = round_stats[(round_stats['round_category'] == 'Force buy round') & (round_stats['side'] == 'T')]
                 winrate_forcebuy_terrorist = int(forcebuy_terrorist['win_%'].values[0]) if not forcebuy_terrorist.empty else 0
                 update_gauge_chart(self.frame_round_type_viz_forcebuy, winrate_forcebuy_terrorist, "Terrorist - Force Buy", "#fbac18", row=1, column=1)
 
