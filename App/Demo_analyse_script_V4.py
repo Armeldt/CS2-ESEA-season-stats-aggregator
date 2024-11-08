@@ -22,27 +22,27 @@ def categorize_rounds(row):
     else:
         return 'Full buy round'
 
-def transform_round_end(round_ends, first_round_tick):
+def transform_round_end(round_winner, first_round_tick):
     # Vérifie si la colonne contient des valeurs legacy qui indiquent les gagnants par un code numérique
-    if 'legacy' in round_ends.columns[1].lower():
+    if 'legacy' in round_winner.columns[1].lower():
         # Remplace les valeurs numériques par les noms d'équipes ('CT' ou 'T')
-        round_ends['winner'] = round_ends['winner'].replace({2: 'T', 3: 'CT'}).fillna('unknown')
+        round_winner['winner'] = round_winner['winner'].replace({2: 'T', 3: 'CT'}).fillna('unknown')
 
         # Traduit les raisons des rounds pour plus de clarté
         reason_dict = {9: 'ct_killed', 7: 'bomb_defused', 8: 't_killed', 12: 't_saved'}
-        round_ends['reason'] = round_ends['reason'].map(reason_dict).fillna('unknown')
+        round_winner['reason'] = round_winner['reason'].map(reason_dict).fillna('unknown')
 
         # Sélectionne et ordonne les colonnes
-        round_ends = round_ends[['ct_team_clan_name', 't_team_clan_name', 'reason', 'tick', 'total_rounds_played', 'winner']]
+        round_winner = round_winner[['ct_team_clan_name', 't_team_clan_name', 'reason', 'tick', 'total_rounds_played', 'winner']]
         # Ajuste le décalage pour total_rounds_played
-        round_ends.loc[:, 'total_rounds_played'] += 1
+        round_winner.loc[:, 'total_rounds_played'] += 1
 
 
     else:
         # Supprime les rounds sans raison valide après le premier round
-        round_ends = round_ends[round_ends['tick'] > first_round_tick].drop(columns=['round'])
+        round_winner = round_winner[round_winner['tick'] > first_round_tick].drop(columns=['round'])
 
-    return round_ends
+    return round_winner
 
 
 # 2. Fonctions de calcul des statistiques
@@ -54,6 +54,7 @@ def calculate_match_stats(all_matches, team_name):
         team_wins, opponent_wins = calculate_match_result(round_info_df, team_name)
 
         game_id = f"Game_{i+1}"  # Nom du match
+        game_name = match['team_info']['Game_id'].iloc[0]
         map_name = match['map_info'].iloc[0]['map_name']  # Nom de la map
 
         # Déterminer l'équipe victorieuse
@@ -64,17 +65,16 @@ def calculate_match_stats(all_matches, team_name):
 
         # Ajouter les informations de match
         match_data.append({
-            "Match id": i + 1,
-            "Game Name": game_id,
+            "Game id": game_id,
+            "Game Name": game_name,
             "Map": map_name,
-            "Rounds Won by zobrux": team_wins,
+            "Rounds Won by team": team_wins,
             "Rounds Won by Opponent": opponent_wins,
             "Winning Team": winning_team
         })
 
     # Créer un DataFrame avec les informations de chaque match
     match_df = pd.DataFrame(match_data)
-
     # Calculer les statistiques globales
     own_team_wins = match_df[match_df['Winning Team'] == team_name].shape[0]
     own_team_losses = match_df[match_df['Winning Team'] != team_name].shape[0]
@@ -112,6 +112,68 @@ def calculate_match_result(round_info_df, team_name):
     opponent_wins = round_info_df['total_rounds_played'].max() - team_wins
     return team_wins, opponent_wins
 
+def detailed_match_result(match_df, team_name):
+    # Analyse des victoires et défaites
+    match_df['round_diff'] = abs(match_df['Rounds Won by team'] - match_df['Rounds Won by Opponent'])
+
+    # Filtrer les victoires et les défaites de l'équipe
+    team_victories = match_df[match_df['Winning Team'] == team_name]
+    team_losses = match_df[match_df['Winning Team'] != team_name]
+
+    # Initialiser le dictionnaire des résultats
+    result_summary = {
+        "largest_win": None,
+        "closest_win": None,
+        "largest_loss": None,
+        "closest_loss": None,
+    }
+
+    # Si l'équipe a gagné au moins un match, trouver la victoire la plus large et la plus serrée
+    if not team_victories.empty:
+        # Victoire la plus large
+        largest_win = team_victories.loc[team_victories['round_diff'].idxmax()]
+        result_summary["largest_win"] = {
+            "game_name": largest_win['Game Name'],
+            "map": largest_win['Map'],
+            "team_score": largest_win['Rounds Won by team'],
+            "opponent_score": largest_win['Rounds Won by Opponent'],
+            "round_diff": largest_win['round_diff']
+        }
+
+        # Victoire la plus serrée
+        closest_win = team_victories.loc[team_victories['round_diff'].idxmin()]
+        result_summary["closest_win"] = {
+            "game_name": closest_win['Game Name'],
+            "map": closest_win['Map'],
+            "team_score": closest_win['Rounds Won by team'],
+            "opponent_score": closest_win['Rounds Won by Opponent'],
+            "round_diff": closest_win['round_diff']
+        }
+
+    # Si l'équipe a perdu au moins un match, trouver la défaite la plus large et la plus serrée
+    if not team_losses.empty:
+        # Défaite la plus large
+        largest_loss = team_losses.loc[team_losses['round_diff'].idxmax()]
+        result_summary["largest_loss"] = {
+            "game_name": largest_loss['Game Name'],
+            "map": largest_loss['Map'],
+            "team_score": largest_loss['Rounds Won by team'],
+            "opponent_score": largest_loss['Rounds Won by Opponent'],
+            "round_diff": largest_loss['round_diff']
+        }
+
+        # Défaite la plus serrée
+        closest_loss = team_losses.loc[team_losses['round_diff'].idxmin()]
+        result_summary["closest_loss"] = {
+            "game_name": closest_loss['Game Name'],
+            "map": closest_loss['Map'],
+            "team_score": closest_loss['Rounds Won by team'],
+            "opponent_score": closest_loss['Rounds Won by Opponent'],
+            "round_diff": closest_loss['round_diff']
+        }
+
+    return result_summary
+
 def calculate_map_stats(match_df, team_name):
     map_stats = match_df.groupby('Map').agg(
         times_played=('Map', 'size'),
@@ -121,44 +183,112 @@ def calculate_map_stats(match_df, team_name):
     return map_stats
 
 def calculate_wr_per_round_type(all_matches, team_name):
+    # Initialiser un DataFrame global pour stocker les rounds par catégorie et par side cumulés
     all_matches_round_analysis = pd.DataFrame()
+
+    # Initialiser des compteurs globaux pour les cas particuliers
+    total_force_against_team_lost = 0
+    total_eco_against_team_lost = 0
+    total_team_eco_against_full_win = 0
+    total_team_force_against_full_win = 0
+
+    # Parcourir chaque match dans 'all_matches'
     for match_data in all_matches:
         eco_by_team = match_data['eco_info']
-        round_info = match_data['round_info']  # Contient la colonne 'winner'
-        
-        # Associer les catégories de round à `eco_by_team`
-        eco_by_team['round_category'] = eco_by_team.apply(categorize_rounds, axis=1)
-        
-        # Fusionner `eco_by_team` et `round_info` sur le numéro du round pour accéder à 'winner'
-        df_merged = pd.merge(eco_by_team, round_info[['total_rounds_played', 'winner']], 
-                             on='total_rounds_played', how='left')
-        
-        # Filtrer les rounds joués par l'équipe `team_name`
-        rounds_team = df_merged[df_merged['team_clan_name'] == team_name]
-        
-        # Calculer le nombre de rounds totaux par catégorie et par side
+        game_id = match_data['team_info']['Game_id'].iloc[0]
+        round_info = match_data['round_info']
+
+        eco_by_team['Game_id'] = game_id
+        round_info['Game_id'] = game_id
+
+        # Fusionner les données de rounds avec l'économie totale de l'équipe de l'attaquant
+        df_merged_team = pd.merge(eco_by_team, round_info[['total_rounds_played', 'Game_id', 'winner']], 
+                                  how='left', left_on=['total_rounds_played', 'Game_id'],
+                                  right_on=['total_rounds_played', 'Game_id'])
+        df_merged_team['side'] = df_merged_team['side'].replace({'TERRORIST': 'T'})
+
+        df_merged_team['round_category'] = df_merged_team.apply(categorize_rounds, axis=1)
+
+        # Filtrer les rounds joués par l'équipe spécifiée
+        rounds_team = df_merged_team[df_merged_team['team_clan_name'] == team_name]
+
+        # Calculer le nombre total de rounds joués dans chaque catégorie et par side
         total_rounds_per_category_side = rounds_team.groupby(['round_category', 'side']).size()
-        
-        # Calculer les victoires et défaites par catégorie et par side
+
+        # Calculer le nombre de victoires et de défaites par catégorie et par side
         wins_per_category_side = rounds_team[rounds_team['winner'] == rounds_team['side']].groupby(['round_category', 'side']).size()
         losses_per_category_side = rounds_team[rounds_team['winner'] != rounds_team['side']].groupby(['round_category', 'side']).size()
-        
-        # Combiner les résultats pour chaque match dans un DataFrame temporaire
+
+        # Combiner les résultats dans un DataFrame pour chaque match
         match_stats = pd.DataFrame({
             'total_rounds': total_rounds_per_category_side,
             'wins': wins_per_category_side,
             'losses': losses_per_category_side
         }).fillna(0).astype(int)
-        
-        # Ajouter les stats du match au DataFrame global
+
+        # Cumuler les résultats dans le DataFrame global
         all_matches_round_analysis = pd.concat([all_matches_round_analysis, match_stats])
 
+        # Calculer les cas particuliers pour ce match
+        force_against_team_lost = df_merged_team[
+            (df_merged_team['team_clan_name'] == team_name) &
+            (df_merged_team['round_category'] == 'Full buy round') &
+            (df_merged_team['winner'] != df_merged_team['side']) & 
+            (df_merged_team['round_category'].shift(-1) == 'Force buy round')
+        ].shape[0]
+
+        eco_against_team_lost = df_merged_team[
+            (df_merged_team['team_clan_name'] == team_name) &
+            (df_merged_team['round_category'] == 'Full buy round') &
+            (df_merged_team['winner'] != df_merged_team['side']) & 
+            (df_merged_team['round_category'].shift(-1) == 'Eco round')
+        ].shape[0]
+
+        team_eco_against_full_win = df_merged_team[
+            (df_merged_team['team_clan_name'] == team_name) &
+            (df_merged_team['round_category'] == 'Eco round') &
+            (df_merged_team['winner'] == df_merged_team['side']) & 
+            (df_merged_team['round_category'].shift(1) == 'Full buy round')
+        ].shape[0]
+
+        team_force_against_full_win = df_merged_team[
+            (df_merged_team['team_clan_name'] == team_name) &
+            (df_merged_team['round_category'] == 'Force buy round') &
+            (df_merged_team['winner'] == df_merged_team['side']) & 
+            (df_merged_team['round_category'].shift(1) == 'Full buy round')
+        ].shape[0]
+
+        # Cumuler les résultats globaux pour les cas particuliers
+        total_force_against_team_lost += force_against_team_lost
+        total_eco_against_team_lost += eco_against_team_lost
+        total_team_eco_against_full_win += team_eco_against_full_win
+        total_team_force_against_full_win += team_force_against_full_win
+
     # Calcul du winrate et des pourcentages de défaites par type de round et par side
-    wr_per_round_type = all_matches_round_analysis.groupby(['round_category', 'side']).sum()
-    wr_per_round_type['win_%'] = (wr_per_round_type['wins'] / wr_per_round_type['total_rounds'] * 100).round(1)
-    wr_per_round_type['loss_%'] = (wr_per_round_type['losses'] / wr_per_round_type['total_rounds'] * 100).round(1)
-    
-    return wr_per_round_type.reset_index()
+    round_type_analysis = all_matches_round_analysis.groupby(['round_category', 'side']).sum()
+    round_type_analysis['win_%'] = (round_type_analysis['wins'] / round_type_analysis['total_rounds'] * 100).round(1)
+    round_type_analysis['loss_%'] = (round_type_analysis['losses'] / round_type_analysis['total_rounds'] * 100).round(1)
+    round_type_analysis = round_type_analysis.reset_index()
+
+    # Préparer les cas particuliers pour un affichage dans un DataFrame
+    special_cases = pd.DataFrame({
+        'special_case': [
+            'Full Buy lost to Force Buy',
+            'Full Buy lost to Eco',
+            'Eco won against Full Buy',
+            'Force Buy won against Full Buy'
+        ],
+        'count': [
+            total_force_against_team_lost,
+            total_eco_against_team_lost,
+            total_team_eco_against_full_win,
+            total_team_force_against_full_win
+        ]
+    })
+    return {
+        "round_type_analysis": round_type_analysis,
+        "special_cases": special_cases,
+    }
 
 def calculate_util_stats(joueurs, all_matches):
     all_utils_stats = pd.DataFrame()
@@ -193,19 +323,6 @@ def calculate_util_stats(joueurs, all_matches):
         all_utils_stats = pd.concat([all_utils_stats, utils_joueurs])
 
     return all_utils_stats.groupby('name').sum().reset_index()
-
-def calculate_player_stats(joueurs, all_matches):
-    all_players_stats = pd.DataFrame()
-    for match_data in all_matches:
-        stats = match_data['agg_stats']
-        Stats_joueurs = joueurs.merge(stats, on='name', how='left')
-        all_players_stats = pd.concat([all_players_stats, Stats_joueurs])
-        
-    # Agrégation des statistiques
-    all_players_stats_grouped = all_players_stats.groupby('name').sum().reset_index()
-    all_players_stats_grouped['ADR'] = round(all_players_stats_grouped['damage_total'] / all_players_stats_grouped["total_rounds_played"], 2)
-    all_players_stats_grouped['+/-'] = all_players_stats_grouped['kills_total'] - all_players_stats_grouped["deaths_total"]
-    return all_players_stats_grouped
 
 def calculate_entry_stats(joueurs, all_matches):
     all_opening_stats = pd.DataFrame()
@@ -244,6 +361,7 @@ def calculate_trading_stats(joueurs, all_matches):
     
     for match_data in all_matches:
         player_death = match_data['player_death_info']
+        print(player_death[['tick','attacker_name','team_clan_name_attacker','side_attacker','team_clan_name_user','side_user']])
         
         for round_number in player_death['total_rounds_played'].unique():
             round_data = player_death[player_death['total_rounds_played'] == round_number].sort_values(by='player_died_time')
@@ -275,16 +393,20 @@ def calculate_trading_stats(joueurs, all_matches):
                                 'round': round_number
                             })
                             break
-
+    print("trade_kills",trade_kills_global)
+    print("tradeded_deaths",traded_deaths_global)
     # Création des DataFrames pour les statistiques
     traded_deaths_df_global = pd.DataFrame(traded_deaths_global)
     trade_kills_df_global = pd.DataFrame(trade_kills_global)
+    print("trade kills df ",trade_kills_df_global)
+    print("traded deaths df ",traded_deaths_df_global)
+
     # Comptage des traded deaths et trade kills
     traded_deaths_count_global = traded_deaths_df_global.groupby(['player', 'side_user']).size().unstack(fill_value=0).reset_index()
     trade_kills_count_global = trade_kills_df_global.groupby(['player', 'side_user']).size().unstack(fill_value=0).reset_index()
-
-    traded_deaths_count_global.columns = ['player', 'Traded_deaths(CT)', 'Traded_deaths(T)']
-    trade_kills_count_global.columns = ['player', 'Trade_kills(CT)', 'Trade_kills(T)']
+    print('trade_kills_count_global',trade_kills_count_global)
+    traded_deaths_count_global.columns = ['player','Traded_deaths(CT)','Traded_deaths(T)']
+    trade_kills_count_global.columns = ['player','Trade_kills(CT)','Trade_kills(T)']
 
     trade_df_global = pd.merge(traded_deaths_count_global, trade_kills_count_global, on='player', how='outer').fillna(0)
     trade_df_global = trade_df_global.rename(columns={'player': 'name'})
@@ -312,7 +434,8 @@ def calculate_eco_kills(joueurs, all_matches):
         eco_stats = pd.merge(joueurs,all_team_eco_kills_grouped,left_on='name',right_on='attacker_name',how='left')
     return eco_stats
 
-def calculate_advanced_stats(joueurs, all_matches):
+def calculate_player_stats(joueurs, all_matches):
+    # Calcul des statistiques avancées
     player_stats_global = {}
 
     for match_data in all_matches:
@@ -368,22 +491,52 @@ def calculate_advanced_stats(joueurs, all_matches):
                                 kast_contributed = True
                             break
 
-    # Calcul des pourcentages et des indicateurs avancés
-    for player, stats in player_stats_global.items():
-        stats['KAST%'] = round((stats['KAST_rounds'] / stats['total_rounds']) * 100, 1)
-        kills_per_round = stats['Kills'] / stats['total_rounds']
-        assists_per_round = stats['Assists'] / stats['total_rounds']
-        deaths_per_round = stats['Deaths'] / stats['total_rounds']
-        stats["KPR"] = round(kills_per_round, 2)
-        stats["APR"] = round(assists_per_round, 2)
-        stats['DPR'] = round(deaths_per_round, 2)
-        stats['Impact'] = round((2.13 * kills_per_round) + (0.42 * assists_per_round) - 0.41, 2)
+    # Conversion en DataFrame et calcul des pourcentages et indicateurs avancés
+    advanced_stats_df = pd.DataFrame.from_dict(player_stats_global, orient='index').reset_index().rename(columns={'index': 'name'})
+    advanced_stats_df['KAST%'] = round((advanced_stats_df['KAST_rounds'] / advanced_stats_df['total_rounds']) * 100, 1)
+    advanced_stats_df["KPR"] = round(advanced_stats_df['Kills'] / advanced_stats_df['total_rounds'], 2)
+    advanced_stats_df["APR"] = round(advanced_stats_df['Assists'] / advanced_stats_df['total_rounds'], 2)
+    advanced_stats_df['DPR'] = round(advanced_stats_df['Deaths'] / advanced_stats_df['total_rounds'], 2)
+    advanced_stats_df['Impact'] = round((2.13 * advanced_stats_df['KPR']) + (0.42 * advanced_stats_df['APR']) - 0.41, 2)
 
-    # Conversion en DataFrame pour intégration
-    advanced_stats_df = pd.DataFrame(player_stats_global).T.reset_index().rename(columns={'index': 'name'})
-    advanced_stats_df = advanced_stats_df.astype({'Kills':int,'Assists':int,'Deaths':int,'KAST_rounds':int,'total_rounds':int,'Traded_deaths':int})
-    advanced_stats_df = pd.merge(joueurs,advanced_stats_df,on='name',how='left')
-    return advanced_stats_df
+    # Calcul des statistiques de base des joueurs
+    all_players_stats = pd.DataFrame()
+    for match_data in all_matches:
+        stats = match_data['agg_stats']
+        Stats_joueurs = joueurs.merge(stats, on='name', how='left')
+        all_players_stats = pd.concat([all_players_stats, Stats_joueurs])
+
+    # Agrégation des statistiques de base
+    all_players_stats_grouped = all_players_stats.groupby('name').sum().reset_index()
+    all_players_stats_grouped['ADR'] = round(all_players_stats_grouped['damage_total'] / all_players_stats_grouped["total_rounds_played"], 2)
+    all_players_stats_grouped['+/-'] = all_players_stats_grouped['kills_total'] - all_players_stats_grouped["deaths_total"]
+    all_players_stats_grouped['HS %'] = round((all_players_stats_grouped['headshot_kills_total'] / all_players_stats_grouped['kills_total'])*100,2)
+    # Combinaison des statistiques de base et avancées
+    scoreboard = all_players_stats_grouped.merge(
+        advanced_stats_df[['name', 'Traded_deaths', 'KAST%', 'Impact','KPR','DPR']],
+        on='name', how='left'
+    )
+
+    # Nettoyage du DataFrame final
+    scoreboard.drop(columns=['steamid', 'Traded_deaths'], inplace=True, errors='ignore')
+    scoreboard = scoreboard.rename(columns={"total_rounds_played":"Rounds joués","headshot_kills_total":"HS","kills_total":"Kills","assists_total":"Assists","deaths_total":"Deaths","3k_rounds_total":'3K', "4k_rounds_total":'4K', "ace_rounds_total":'5K',"damage_total":"Damages","utility_damage_total":"Utility Damages","enemies_flashed_total":"Flashed Ennemies"})
+    scoreboard = scoreboard.drop(columns={"alive_time_total","Damages","HS",'Flashed Ennemies','Utility Damages'})
+    scoreboard['K/D'] = round(scoreboard['Kills'] / scoreboard['Deaths'], 2)
+    scoreboard['Rating'] = round((0.0073 * scoreboard['KAST%']) + \
+                              (0.3591 * (scoreboard['KPR'])) + \
+                              (-0.5329 * (scoreboard['DPR'])) + \
+                              (0.2372 * scoreboard['Impact']) + \
+                              (0.0032 * scoreboard['ADR']) + 0.1587,2)
+    nouvel_ordre_colonnes = [
+                'name', 'Rounds joués', 'Kills', 'Deaths', 'Assists', '+/-',
+                'K/D', 'ADR', 'KPR', 'DPR','HS %', '5K', '4K', '3K', 'mvps','KAST%','Impact','Rating'
+            ]
+    scoreboard = scoreboard[nouvel_ordre_colonnes]
+    return scoreboard
+
+
+
+
 
 
 # 3. Fonction principale
@@ -397,36 +550,50 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
 
     # Parsing des fichiers de démos
     for filename in glob(os.path.join(demo_directory, "*.dem")):
-        
+
         demo = DemoParser(os.path.join(demo_directory, filename))
+
+        tick_round_start = demo.parse_event("round_start",other=['total_rounds_played'])[["total_rounds_played","tick"]].drop([0,1,2])
+        tick_round_start["total_rounds_played"] = tick_round_start["total_rounds_played"].astype(int) +1
+        tick_round_start.rename(columns={'tick':'tick_start_round'},inplace=True)
+        tick_freezetime_end = demo.parse_event("round_freeze_end",other=['total_rounds_played'])[["total_rounds_played",'tick']]
+        tick_freezetime_end.rename(columns={'tick':'tick_freezetime_end'},inplace=True)
+        round_ticks = pd.merge_asof(tick_round_start,tick_freezetime_end[['tick_freezetime_end']], left_on='tick_start_round',right_on='tick_freezetime_end', direction='forward')
+        tick_round_end = demo.parse_event("round_end",other=['total_rounds_played'])[["total_rounds_played","tick"]]
+        tick_round_end.rename(columns={'tick':'tick_end_round'},inplace=True)
+        round_ticks = pd.merge_asof(round_ticks,tick_round_end[['tick_end_round']], left_on='tick_start_round',right_on='tick_end_round', direction='forward')
+        round_ticks
         
-        max_tick = demo.parse_event("round_end")["tick"].max()
+        max_tick = round_ticks['tick_end_round'].max()
         
-        first_round_tick = demo.parse_event('round_start').drop([0,1,2]).loc[3, 'tick']
+        first_round_tick = round_ticks['tick_start_round'].min()
+
+        freezetime_end_tick = round_ticks["tick_freezetime_end"].tolist()
         
         map = pd.DataFrame([demo.parse_header()])
-        
-        freezetime_end_tick = demo.parse_event("round_freeze_end")["tick"].drop([0,1]).tolist()
         
         team = demo.parse_ticks(["team_clan_name", "team_name"])
         team = team[(team['tick'] >= first_round_tick) & (team['tick'] <= max_tick)].copy()
         team.rename(columns={'team_name': 'side'}, inplace=True)
+
+        print("team df",team)
         unique_teams = team['team_clan_name'].unique()
         adversary_team = [t for t in unique_teams if t != team_name][0]
         game_id = f"VS_{adversary_team}" 
         team = team[team['team_clan_name'] == team_name]
         
         eco = demo.parse_ticks(["current_equip_value", "total_rounds_played"], ticks=freezetime_end_tick)
-        eco['current_equip_value'] -= 200
-        eco = eco.merge(team[['tick', 'team_clan_name', 'side']], on='tick', how='left')
-        eco_by_team = eco.groupby(['total_rounds_played', 'team_clan_name', 'tick', 'side'])['current_equip_value'].sum().reset_index()
-        
+        eco['current_equip_value'] = eco['current_equip_value']-200
+        eco = pd.merge(round_ticks[['total_rounds_played','tick_freezetime_end']],eco[['current_equip_value','tick','name','steamid']],left_on='tick_freezetime_end',right_on='tick')
+        eco_by_players = pd.merge(eco,team, on=['tick','name','steamid'])
+        eco_by_team = eco_by_players.groupby(['total_rounds_played','team_clan_name','tick','side'])['current_equip_value'].sum().reset_index()
+       
         # Charger le DataFrame `player_death` avec les informations sur les kills
         player_death = demo.parse_event("player_death", other=["game_time", "round_start_time", "total_rounds_played"])
         player_death.loc[:, 'total_rounds_played'] += 1
-        player_death = player_death[player_death['tick'] >= first_round_tick].copy()
+        # player_death = player_death[player_death['tick'] >= first_round_tick].copy()
+        player_death.drop(player_death[player_death['tick'] < first_round_tick].index, inplace=True)
         player_death["player_died_time"] = player_death["game_time"] - player_death["round_start_time"]
-
         # Ajouter `team_clan_name` et `side` pour `attacker_name` et `user_name` dans `player_death`
         player_death = pd.merge(player_death, team[['team_clan_name', 'side', 'name', 'tick']], 
                                 left_on=["attacker_name", 'tick'], right_on=['name', 'tick'], how='left').rename(columns={'team_clan_name': 'team_clan_name_attacker', 'side': 'side_attacker'})
@@ -437,9 +604,9 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
         all_hits_regs = demo.parse_event("player_hurt", ticks=[max_tick])
         all_hits_regs = all_hits_regs[(all_hits_regs['tick'] >= first_round_tick) & (all_hits_regs['tick'] <= max_tick)].copy()
         
-        round_ends = demo.parse_event("round_end", other=["total_rounds_played", "team_clan_name"])
-        round_ends = transform_round_end(round_ends, first_round_tick)
-        
+        round_winner = demo.parse_event("round_end", other=["total_rounds_played", "team_clan_name"])
+        round_winner = transform_round_end(round_winner, first_round_tick)
+        round_winner = pd.merge(round_ticks[['total_rounds_played','tick_end_round']],round_winner[['ct_team_clan_name','t_team_clan_name','reason','tick','winner']],left_on='tick_end_round',right_on='tick')
         
 
         overall_stats = ["total_rounds_played","kills_total","assists_total","deaths_total", "mvps", "headshot_kills_total", 
@@ -454,21 +621,21 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
             'damage_info': all_hits_regs,
             'agg_stats': agg_stats,
             'eco_info': eco_by_team.assign(Game_id=game_id),
-            'round_info': round_ends.assign(Game_id=game_id),
+            'round_info': round_winner.assign(Game_id=game_id),
             'map_info': map.assign(Game_id=game_id)
         }
         all_matches.append(match_data_single)
 
     # Calculer les statistiques de match
     match_stats = calculate_match_stats(all_matches, team_name)
-    joueurs = pd.DataFrame({'name': team.loc[(team['team_clan_name'] == 'zobrux') & (team['tick'] == first_round_tick), 'name'].unique()})
+    joueurs = pd.DataFrame({'name': team.loc[(team['team_clan_name'] == team_name) & (team['tick'] == first_round_tick), 'name'].unique()})
     util_stats = calculate_util_stats(joueurs, all_matches)
-    player_stats = calculate_player_stats(joueurs, all_matches)
+    scoreboard = calculate_player_stats(joueurs, all_matches)
     entry_stats = calculate_entry_stats(joueurs, all_matches)
     eco_kills = calculate_eco_kills(joueurs, all_matches)
-    advanced_stats = calculate_advanced_stats(joueurs, all_matches)
     wr_per_round_type = calculate_wr_per_round_type(all_matches, team_name)
     trading_stats = calculate_trading_stats(joueurs, all_matches)
+    detailed_results = detailed_match_result(match_stats["match_results"], team_name)
 
     # Retourner tous les résultats
     results = {
@@ -477,25 +644,32 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
         "own_team_losses": match_stats["own_team_losses"],
         "winstreak": match_stats["winstreak"],
         "map_stats": match_stats["map_stats"],
-        "wr_per_round_type": wr_per_round_type,
+        "wr_per_round_type": wr_per_round_type["round_type_analysis"],
+        "special_round_type":wr_per_round_type["special_cases"],
         "util_stats": util_stats,
-        "player_stats": player_stats,
+        # "player_stats": player_stats,
         "entry_stats": entry_stats,
         "eco_kills": eco_kills,
-        "advanced_stats": advanced_stats,
+        # "advanced_stats": advanced_stats,
         "trading_stats": trading_stats,
+        "detailed_match_results": detailed_results,
+        "scoreboard":scoreboard
     }
     return results
 
-# results = cumulate_stats()
+results = cumulate_stats()
 # print("Map Stats:\n", results['map_stats'])
 # print("Win Rate per Round Type:\n", results['wr_per_round_type'])
+# print("Win Rate per special Round Type:\n", results['special_round_type'])
 # print("Utility Stats:\n", results['util_stats'])
-# print("Player Stats:\n", results['player_stats'])
 # print("Entry Stats:\n", results['entry_stats'])
-# print("Eco Kills:\n", results['eco_kills'])
-# print("Advanced Stats:\n", results['advanced_stats'])
-# print("Trading Stats:\n", results['trading_stats'])
+print("Eco Kills:\n", results['eco_kills'])
+print("Trading Stats:\n", results['trading_stats'])
+# print("Detailed Match Results:\n", results['detailed_match_results'])
+#print("scoreboard:\n", results['scoreboard'])
+
+# Utilisation de la fonction
+
 
 def run_analysis(team_name, file_paths):
     # Appelle cumulate_stats avec les paramètres fournis

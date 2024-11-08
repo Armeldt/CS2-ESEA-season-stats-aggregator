@@ -47,8 +47,8 @@ class App(ctk.CTk):
         self.analysis_results = results
         # Appelle les méthodes de mise à jour pour chaque page avec les nouveaux résultats
         self.team_summary_page.update_data(self.analysis_results)
-        # self.players_details_page.update_data(self.analysis_results)
-        # self.raw_data_page.update_data(self.analysis_results)
+        self.players_details_page.update_data(self.analysis_results)
+        self.raw_data_page.update_data(self.analysis_results)
 
     def create_home_header(self):
         #### Header ####
