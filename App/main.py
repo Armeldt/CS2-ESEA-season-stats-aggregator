@@ -79,7 +79,6 @@ class App(ctk.CTk):
     def create_default_header(self):
         frame_header = ctk.CTkFrame(self)
         frame_header.grid(row=0, column=0, sticky="nwe")
-
         # Configurer les colonnes du frame_header
         frame_header.grid_columnconfigure(0, weight=1)
         frame_header.grid_columnconfigure(1, weight=1)

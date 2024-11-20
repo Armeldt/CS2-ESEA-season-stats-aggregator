@@ -601,7 +601,7 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
                                 left_on=["user_name", 'tick'], right_on=['name', 'tick'], how='left').rename(columns={'team_clan_name': 'team_clan_name_user', 'side': 'side_user'})
         player_death = player_death.drop(columns=['name_x', 'name_y'])
 
-        all_hits_regs = demo.parse_event("player_hurt", ticks=[max_tick])
+        all_hits_regs = demo.parse_event("player_hurt",ticks=[max_tick])
         all_hits_regs = all_hits_regs[(all_hits_regs['tick'] >= first_round_tick) & (all_hits_regs['tick'] <= max_tick)].copy()
         
         round_winner = demo.parse_event("round_end", other=["total_rounds_played", "team_clan_name"])
@@ -663,8 +663,8 @@ results = cumulate_stats()
 # print("Win Rate per special Round Type:\n", results['special_round_type'])
 # print("Utility Stats:\n", results['util_stats'])
 # print("Entry Stats:\n", results['entry_stats'])
-print("Eco Kills:\n", results['eco_kills'])
-print("Trading Stats:\n", results['trading_stats'])
+# print("Eco Kills:\n", results['eco_kills'])
+# print("Trading Stats:\n", results['trading_stats'])
 # print("Detailed Match Results:\n", results['detailed_match_results'])
 #print("scoreboard:\n", results['scoreboard'])
 
