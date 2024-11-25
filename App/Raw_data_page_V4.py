@@ -32,50 +32,53 @@ class RawDataPage(ctk.CTkFrame):
         frame_body.grid(row=1, column=0, sticky="nwes")
         frame_body.grid_columnconfigure((0,1),weight=1)
         frame_body.grid_rowconfigure((0,1,2),weight=1)
-
-
+        
         frame_scoreboard = ctk.CTkFrame(frame_body)
-        frame_scoreboard.grid(row=0, column=0,columnspan=2, sticky="nwe")
+        frame_scoreboard.grid(row=0, column=0,columnspan=2, sticky="nwes",pady=(10,5),padx=10)
+
+        label_scoreboard = ctk.CTkLabel(frame_scoreboard,text='Aggregated scoreboard')
+        label_scoreboard.pack(side='top',pady=5,padx=5)
 
         self.table_scoreboard = CTkTable(master=frame_scoreboard, row=6, column=18, values=values_scoreboard, width=80, height=30)
-        self.table_scoreboard.grid(row=2, column=0, columnspan=3,padx=20, pady=20, sticky="new")
+        self.table_scoreboard.pack()
 
         frame_utils = ctk.CTkFrame(frame_body)
-        frame_utils.grid(row=1, column=0, sticky="nwes")
+        frame_utils.grid(row=1, column=0, sticky="nwes",pady=5,padx=(10,5))
 
         label_utils = ctk.CTkLabel(frame_utils,text='Raw data utility use & efficiency')
-        label_utils.pack(side='top',pady=10,padx=10)
+        label_utils.pack(side='top',pady=5,padx=5)
 
         self.table_utils = CTkTable(frame_utils, row=6, column=6, values=values_utils, width=90, height=30)
         self.table_utils.pack()
 
         frame_entry = ctk.CTkFrame(frame_body)
-        frame_entry.grid(row=1, column=1, sticky="nwes")
+        frame_entry.grid(row=1, column=1, sticky="nwes",pady=5,padx=(5,10))
 
         label_entry = ctk.CTkLabel(frame_entry,text='Raw data entry frags')
-        label_entry.pack(side='top',pady=10,padx=10)
+        label_entry.pack(side='top',pady=5,padx=5)
 
         self.table_entry = CTkTable(frame_entry, row=6, column=7, values=values_entry, width=90, height=30)
         self.table_entry.pack()
 
         frame_trades = ctk.CTkFrame(frame_body)
-        frame_trades.grid(row=2, column=0, sticky="nwes")
+        frame_trades.grid(row=2, column=0, sticky="nwes",pady=(5,10),padx=(10,5))
 
         label_trades = ctk.CTkLabel(frame_trades,text='Raw data trades')
-        label_trades.pack(side='top',pady=10,padx=10)
+        label_trades.pack(side='top',pady=5,padx=5)
 
         self.table_trades = CTkTable(frame_trades,row=6, column=5,  values=values_trades, width=90, height=30)
         self.table_trades.pack()
 
         frame_eco = ctk.CTkFrame(frame_body)
-        frame_eco.grid(row=2, column=1, sticky="nwes")
+        frame_eco.grid(row=2, column=1, sticky="nwes",pady=(5,10),padx=(5,10))
 
-        label_eco = ctk.CTkLabel(frame_eco,text='Raw data kills impact with economy state')
-        label_eco.pack(side='top',pady=10,padx=10)
+        label_eco = ctk.CTkLabel(frame_eco,text='Kills according to opponent buy')
+        label_eco.pack(side='top',pady=5,padx=5)
 
-        self.table_eco = CTkTable(frame_eco, row=6, column=8, values=values_eco, width=80, height=30)
-        self.table_eco.pack(side='top',pady=10,padx=10)
+        self.table_eco = CTkTable(frame_eco, row=6, column=5, values=values_eco, width=100, height=30)
+        self.table_eco.pack(side='top',pady=5,padx=5)
 
+    
     def update_data(self, analysis_results):
         
         
@@ -128,17 +131,17 @@ class RawDataPage(ctk.CTkFrame):
             ]
         self.table_trades.configure(values=values_trades)
 
-        # df_eco = analysis_results.get("trading_stats", pd.DataFrame())
+        df_eco = analysis_results.get("eco_kills", pd.DataFrame())
 
-        # if not df_eco.empty:
-        #     headers = list(df_eco.columns)
-        #     values_eco = [headers] + scoreboard.values.tolist()
-        # else:
-        #     values_eco = [
-        #         ["name", "He_dmg", "Fire_dmg", "Total_utility_dmg", "enemies_flashed_total", "Flash_assist"],
+        if not df_eco.empty:
+            headers = list(df_eco.columns)
+            values_eco = [headers] + df_eco.values.tolist()
+        else:
+            values_eco = [
+                ["name", "Against full eco", "Against force buy", "Against full buy","Pistol rounds"],
                 
-        #     ]
-        # self.table_eco.configure(values=values_eco)
+            ]
+        self.table_eco.configure(values=values_eco)
 
 if __name__ == "__main__":
     app = RawDataPage()

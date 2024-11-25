@@ -4,6 +4,7 @@ from Team_summary_page_V4 import TeamSummaryPage
 from Players_details_page_V4 import PlayerDetailPage
 from Raw_data_page_V4 import RawDataPage
 
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -126,3 +127,4 @@ if __name__ == "__main__":
     app = App()
     app.protocol("WM_DELETE_WINDOW", app.quit)
     app.mainloop()
+
