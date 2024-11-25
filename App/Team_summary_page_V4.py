@@ -73,7 +73,7 @@ class TeamSummaryPage(ctk.CTkFrame):
 
         # configure grid layout for main window
         self.grid_columnconfigure(0, weight=1)  
-        self.grid_columnconfigure(1, weight=3)  
+        self.grid_columnconfigure(1, weight=5)  
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=4)
         self.grid_rowconfigure(2, weight=2)
