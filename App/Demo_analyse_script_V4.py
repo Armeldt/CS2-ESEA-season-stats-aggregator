@@ -5,7 +5,7 @@ import os
 from glob import glob
 
 # 1. Fonctions utilitaires
-def select_directory(file_paths="D:/Python/projet_cs_v2/demos"):
+def select_directory(file_paths=""):
     if not os.path.isdir(file_paths):
         print("Invalid directory.")
         return None
@@ -361,7 +361,6 @@ def calculate_trading_stats(joueurs, all_matches):
     
     for match_data in all_matches:
         player_death = match_data['player_death_info']
-        print(player_death[['tick','attacker_name','team_clan_name_attacker','side_attacker','team_clan_name_user','side_user']])
         
         for round_number in player_death['total_rounds_played'].unique():
             round_data = player_death[player_death['total_rounds_played'] == round_number].sort_values(by='player_died_time')
@@ -393,18 +392,15 @@ def calculate_trading_stats(joueurs, all_matches):
                                 'round': round_number
                             })
                             break
-    print("trade_kills",trade_kills_global)
-    print("tradeded_deaths",traded_deaths_global)
+
     # Création des DataFrames pour les statistiques
     traded_deaths_df_global = pd.DataFrame(traded_deaths_global)
     trade_kills_df_global = pd.DataFrame(trade_kills_global)
-    print("trade kills df ",trade_kills_df_global)
-    print("traded deaths df ",traded_deaths_df_global)
 
     # Comptage des traded deaths et trade kills
     traded_deaths_count_global = traded_deaths_df_global.groupby(['player', 'side_user']).size().unstack(fill_value=0).reset_index()
     trade_kills_count_global = trade_kills_df_global.groupby(['player', 'side_user']).size().unstack(fill_value=0).reset_index()
-    print('trade_kills_count_global',trade_kills_count_global)
+
     traded_deaths_count_global.columns = ['player','Traded_deaths(CT)','Traded_deaths(T)']
     trade_kills_count_global.columns = ['player','Trade_kills(CT)','Trade_kills(T)']
 
@@ -432,6 +428,8 @@ def calculate_eco_kills(joueurs, all_matches):
         all_team_eco_kills = pd.concat([all_team_eco_kills, team_eco_kills])
         all_team_eco_kills_grouped = all_team_eco_kills.groupby('attacker_name').sum().reset_index()
         eco_stats = pd.merge(joueurs,all_team_eco_kills_grouped,left_on='name',right_on='attacker_name',how='left')
+        eco_stats.rename(columns={'Eco round':'Against full eco','Force buy round':'Against force buy','Full buy round':'Against full buy'},inplace=True)
+        eco_stats.drop(columns={'attacker_name'},inplace=True)
     return eco_stats
 
 def calculate_player_stats(joueurs, all_matches):
@@ -532,7 +530,8 @@ def calculate_player_stats(joueurs, all_matches):
                 'K/D', 'ADR', 'KPR', 'DPR','HS %', '5K', '4K', '3K', 'mvps','KAST%','Impact','Rating'
             ]
     scoreboard = scoreboard[nouvel_ordre_colonnes]
-    return scoreboard
+    
+    return scoreboard.sort_values(by=['Rating'],ascending=False)
 
 
 
@@ -540,7 +539,7 @@ def calculate_player_stats(joueurs, all_matches):
 
 
 # 3. Fonction principale
-def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"):
+def cumulate_stats(team_name="", file_paths=""):
     # Sélection du répertoire et initialisation des variables
     demo_directory = select_directory(file_paths)
     if not demo_directory:
@@ -576,11 +575,10 @@ def cumulate_stats(team_name="zobrux", file_paths="D:/Python/projet_cs_v2/demos"
         team = team[(team['tick'] >= first_round_tick) & (team['tick'] <= max_tick)].copy()
         team.rename(columns={'team_name': 'side'}, inplace=True)
 
-        print("team df",team)
         unique_teams = team['team_clan_name'].unique()
         adversary_team = [t for t in unique_teams if t != team_name][0]
         game_id = f"VS_{adversary_team}" 
-        team = team[team['team_clan_name'] == team_name]
+        # team = team[team['team_clan_name'] == team_name]
         
         eco = demo.parse_ticks(["current_equip_value", "total_rounds_played"], ticks=freezetime_end_tick)
         eco['current_equip_value'] = eco['current_equip_value']-200
