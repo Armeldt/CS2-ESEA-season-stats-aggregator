@@ -88,10 +88,9 @@ class HomePage(ctk.CTkFrame):
         frame_body_bottom = ctk.CTkFrame(frame_body,fg_color='transparent')
         frame_body_bottom.grid(row=3, column=0, columnspan=2, sticky="nwes", pady=(10,20),padx=20)
         # frame_body_bottom.grid_columnconfigure((0,1),weight=1)
-        label_wam = ctk.CTkLabel(frame_body_bottom, text="Proudly built by Armeldt", justify='left', font=('Montserrat', 14), padx=20)
+        label_wam = ctk.CTkLabel(frame_body_bottom, text="Built by Armeldt thanks to LaihoE demoparser tool", justify='left', font=('Montserrat', 14), padx=20)
         label_wam.pack(side='bottom')
-        # label_wam.grid(row=0,column=0, pady=20,sticky="new")
-
+        
         #logo = ctk.CTkImage(dark_image=Image.open('Assets/Maps/ancient.png'), size=(200,100))
 
 
