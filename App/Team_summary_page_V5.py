@@ -9,7 +9,7 @@ import pandas as pd
        
     
 
-def round_corners_top(image, radius, background_color=(141, 141, 185)):
+def round_corners_top(image, radius, background_color=(41, 41, 41)):
     """Applique des coins arrondis uniquement en haut à une image et ajoute une couleur de fond."""
     width, height = image.size
 
@@ -44,8 +44,8 @@ def update_gauge_chart(parent, value,value1,value2, title_text, gauge_color, row
     fig, ax = plt.subplots(figsize=(1, 1), subplot_kw={'projection': 'polar'})
     ax.barh(1, np.radians(angle_range), left=np.radians(315), color="lightgray", height=0.3)
     ax.barh(1, np.radians(fill_angle), left=np.radians(315), color=gauge_color, height=0.3)
-    ax.text(0, 0, f"{value:.0f}%", ha='center', va='top', fontsize=10, color="white")
-    ax.text(0, 0, f"{value1:.0f}/{value2:.0f}", ha='center', va='bottom', fontsize=10, color="white")
+    ax.text(0, 0.2, f"{value:.0f}%", ha='center', va='top', fontsize=10, color="white")  
+    ax.text(0, 0, f"{value1:.0f}/{value2:.0f}", ha='center', va='bottom', fontsize=10, color="white")  
     plt.title(title_text, color='white', fontsize=10, pad=20)
     
     # Clear axis details for a cleaner look
@@ -61,7 +61,7 @@ def update_gauge_chart(parent, value,value1,value2, title_text, gauge_color, row
     # Attach the figure to Tkinter canvas and place it in the grid
     canvas = FigureCanvasTkAgg(fig, master=parent)
     canvas.draw()
-    canvas.get_tk_widget().config(bg="#8D8DB9", highlightthickness=0)
+    canvas.get_tk_widget().config(bg="#292929", highlightthickness=0)
     canvas.get_tk_widget().grid(row=row, column=column, sticky="nsew")
 
 
@@ -91,84 +91,81 @@ class TeamSummaryPage(ctk.CTkFrame):
 
         # Configure grid for the frame_left (columns 1 and 2 combined)
         
-        frame_record = ctk.CTkFrame(frame_left, corner_radius=20,fg_color='#1a1a1a')#background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
+        frame_record = ctk.CTkFrame(frame_left,fg_color='#1a1a1a')
         frame_record.grid_columnconfigure((0, 1, 2), weight=1)
         frame_record.grid(row=0, column=0, columnspan=2, pady=(10,10), sticky="nsew")
 
         self.label_team_name = ctk.CTkLabel(frame_record, text="",text_color='white', font=("Stratum2 Bd", 36))
         self.label_team_name.grid(row=0, column=0, sticky="nsew",padx=20, pady=20)
 
-        self.label_team_record_wins = ctk.CTkLabel(frame_record, text="",fg_color='green',text_color='white', corner_radius=20,font=("Stratum2 Bd", 24))
+        self.label_team_record_wins = ctk.CTkLabel(frame_record, text="",fg_color='green',text_color='white', corner_radius=6,font=("Stratum2 Bd", 24))
         self.label_team_record_wins.grid(row=0, column=1, sticky="nsew",padx=20, pady=20)
 
-        self.label_team_record_losses= ctk.CTkLabel(frame_record, text="",fg_color='red',text_color='white', corner_radius=20,font=("Stratum2 Bd", 24))
+        self.label_team_record_losses= ctk.CTkLabel(frame_record, text="",fg_color='red',text_color='white', corner_radius=6,font=("Stratum2 Bd", 24))
         self.label_team_record_losses.grid(row=0, column=2, sticky="nsew",padx=20, pady=20)
 
         #bg maps
-        self.frame_bg_maps = ctk.CTkFrame(frame_left, fg_color='#8D8DB9', corner_radius=20)#,background_corner_colors=('#1a1a1a','#1a1a1a','#1a1a1a','#1a1a1a'))
-        self.frame_bg_maps.grid(row=1, column=0, columnspan=3,rowspan=5, sticky="nsew", pady=(10,0))
+        self.frame_bg_maps = ctk.CTkFrame(frame_left, fg_color='#292929')
+        self.frame_bg_maps.grid(row=1, column=0, columnspan=2,rowspan=5, sticky="nsew", pady=(10,0))
 
-        #Sous-titre (Titre de la sous-catégorie) avec fond bleu
-        self.frame_subtitle = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20,bg_color='transparent',background_corner_colors=('','','#8D8DB9','#8D8DB9'))
-        self.frame_subtitle.grid(row=1, column=0, columnspan=3, sticky="nsew",pady=(10,0))
         # Label sous-titre centré avec pack
-        self.label_subtitle = ctk.CTkLabel(self.frame_subtitle, text='Winrate by maps', font=("Stratum2 Bd", 28), text_color='white')
-        self.label_subtitle.pack(expand=True, padx=10, pady=10)
+        self.label_subtitle = ctk.CTkLabel(frame_left, text='Winrate by maps', font=("Stratum2 Bd", 28), text_color='white', fg_color='#292929')
+        self.label_subtitle.grid(row=1, column=0, columnspan=2, sticky="",pady=(20,10))
 
         # chargement des images
         target_size = (200, 100)  # Dimensions finales
-        self.ancient_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/ancient.png'), 30), size=target_size)
-        self.mirage_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/mirage.png'), 30), size=target_size)
-        self.nuke_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/nuke.png'), 30), size=target_size)
-        self.dust2_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/dust2.jpg'), 30), size=target_size)
-        self.anubis_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/anubis.png'), 30), size=target_size)
-        self.vertigo_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/vertigo.png'), 30), size=target_size)
-        self.inferno_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/inferno.png'), 30), size=target_size)
+        self.ancient_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/ancient.png'), 15), size=target_size)
+        self.mirage_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/mirage.png'), 15), size=target_size)
+        self.nuke_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/nuke.png'), 15), size=target_size)
+        self.dust2_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/dust2.jpg'), 15), size=target_size)
+        self.anubis_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/anubis.png'), 15), size=target_size)
+        self.vertigo_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/vertigo.png'), 15), size=target_size)
+        self.inferno_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/inferno.png'), 15), size=target_size)
         
         # Créer un frame avec un fond bleu et une largeur fixée à celle de l'image
-        self.frame_map_1 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20,width=250, height=180, background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_1 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a',width=250, height=180, background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_1.grid(row=2, column=0, padx=(10,0), pady=(10,5), sticky="n")
         self.label_map_1 = ctk.CTkLabel(self.frame_map_1, text="", image=self.ancient_img)
         self.label_map_1.pack(side="top")
         self.label_map_text_1 = ctk.CTkLabel(self.frame_map_1, text="", text_color='white', font=("Montserrat", 12))
         self.label_map_text_1.pack(side="top", pady=(3, 3))
 
-        self.frame_map_2 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_2 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a', width=250, height=180,background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_2.grid(row=2, column=1, padx=(0,10), pady=(10,5), sticky="n")
         self.label_map_2 = ctk.CTkLabel(self.frame_map_2, text="", image=self.mirage_img)
         self.label_map_2.pack(side="top")
         self.label_map_text_2 = ctk.CTkLabel(self.frame_map_2, text="", fg_color=None, text_color='white', font=("Montserrat", 12))
         self.label_map_text_2.pack(side="top", pady=(3, 3))
 
-        self.frame_map_3 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_3 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a', width=250, height=180,background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_3.grid(row=3, column=0, padx=(10,0), pady=5, sticky="n")
         self.label_map_3 = ctk.CTkLabel(self.frame_map_3, text="", image=self.nuke_img)
         self.label_map_3.pack(side="top")
         self.label_map_text_3 = ctk.CTkLabel(self.frame_map_3, text="", fg_color=None, text_color='white', font=("Montserrat", 12))
         self.label_map_text_3.pack(side="top", pady=(3, 3))
 
-        self.frame_map_4 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_4 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a', width=250, height=180,background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_4.grid(row=3, column=1, padx=(0,10), pady=5, sticky="n")
         self.label_map_4 = ctk.CTkLabel(self.frame_map_4, text="", image=self.dust2_img)
         self.label_map_4.pack(side="top")
         self.label_map_text_4 = ctk.CTkLabel(self.frame_map_4, text="", fg_color=None, text_color='white', font=("Montserrat", 12))
         self.label_map_text_4.pack(side="top", pady=(3, 3))
 
-        self.frame_map_5 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_5 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a', width=250, height=180,background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_5.grid(row=4, column=0, padx=(10,0), pady=5, sticky="n")
         self.label_map_5 = ctk.CTkLabel(self.frame_map_5, text="", image=self.anubis_img)
         self.label_map_5.pack(side="top")
         self.label_map_text_5 = ctk.CTkLabel(self.frame_map_5, text="", fg_color=None, text_color='white', font=("Montserrat", 12))
         self.label_map_text_5.pack(side="top", pady=(3, 3))
 
-        self.frame_map_6 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_6 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a', width=250, height=180,background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_6.grid(row=4, column=1, padx=(0,10), pady=5, sticky="n")
         self.label_map_6 = ctk.CTkLabel(self.frame_map_6, text="", image=self.vertigo_img)
         self.label_map_6.pack(side="top")
         self.label_map_text_6 = ctk.CTkLabel(self.frame_map_6, text="", fg_color=None, text_color='white', font=("Montserrat", 12))
         self.label_map_text_6.pack(side="top", pady=(3, 3))
 
-        self.frame_map_7 = ctk.CTkFrame(frame_left, fg_color='#28397F', corner_radius=20, width=250, height=180,background_corner_colors=('#8D8DB9', '#8D8DB9', '#8D8DB9', '#8D8DB9'))
+        self.frame_map_7 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a', width=250, height=180,background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
         self.frame_map_7.grid(row=5, column=0, columnspan=2, padx=(0,10), pady=(5,15), sticky="n")
         self.label_map_7 = ctk.CTkLabel(self.frame_map_7, text="", image=self.inferno_img)
         self.label_map_7.pack(side="top")
@@ -176,7 +173,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.label_map_text_7.pack(side="top", pady=(3, 3))
 
         #### Second frame for the right side ####
-        frame_right_top = ctk.CTkFrame(self, corner_radius=20,fg_color='transparent')
+        frame_right_top = ctk.CTkFrame(self,fg_color='transparent')
         frame_right_top.grid(row=1, column=1, padx=(10,20), pady=(20,20), sticky="nsew")  # Second frame on right
 
         # Configure grid for the frame_right_top (columns 1 and 2 combined)
@@ -185,14 +182,11 @@ class TeamSummaryPage(ctk.CTkFrame):
         frame_right_top.grid_rowconfigure(1, weight=10)
         frame_right_top.grid_rowconfigure(2, weight=1)
 
-        frame_rounds_type_data_frame = ctk.CTkFrame(frame_right_top, fg_color='#8D8DB9', corner_radius=20)
+        frame_rounds_type_data_frame = ctk.CTkFrame(frame_right_top, fg_color='#292929')
         frame_rounds_type_data_frame.grid(row=0,column=0, columnspan=3,rowspan=3,sticky='nsew')
 
-        frame_rounds_type_title = ctk.CTkFrame(frame_right_top, fg_color='#28397F', corner_radius=20,background_corner_colors=('','#8D8DB9','#8D8DB9','#8D8DB9'))
-        frame_rounds_type_title.grid(row=0,column=0,columnspan=2,sticky="nw")
-
-        rounds_type_title = ctk.CTkLabel(frame_rounds_type_title,text="Win rate by round type", font=("Stratum2 Bd", 28), text_color='white')
-        rounds_type_title.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        rounds_type_title = ctk.CTkLabel(frame_right_top,text="Win rate by round type", font=("Stratum2 Bd", 28), text_color='white',fg_color='#292929')
+        rounds_type_title.grid(row=0, column=0,columnspan=3, padx=20, pady=(10,10), sticky="nw")
 
         ### viz gun round ###
         
@@ -202,7 +196,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.frame_round_type_viz_pistol.grid_rowconfigure(1, weight=3)
         self.frame_round_type_viz_pistol.grid(row=1,column=0, padx=(10,0),pady=(0,15), sticky="nsew")
 
-        viz_1_title = ctk.CTkLabel(self.frame_round_type_viz_pistol,text="Pistol rounds", font=("Montserrat", 18), text_color='white',fg_color='#8D8DB9',bg_color='#8D8DB9') #
+        viz_1_title = ctk.CTkLabel(self.frame_round_type_viz_pistol,text="Pistol rounds", font=("Montserrat", 18), text_color='white',fg_color='#292929')
         viz_1_title.grid(row=0, column=0,columnspan=2,sticky="nsew")
         
         
@@ -214,7 +208,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.frame_round_type_viz_forcebuy.grid_rowconfigure(1, weight=3)
         self.frame_round_type_viz_forcebuy.grid(row=1,column=1,padx=(5,5),pady=(0,15), sticky="nsew")
 
-        viz_1_title = ctk.CTkLabel(self.frame_round_type_viz_forcebuy,text="Force Buy rounds", font=("Montserrat", 18), text_color='white',fg_color='#8D8DB9',bg_color='#8D8DB9')
+        viz_1_title = ctk.CTkLabel(self.frame_round_type_viz_forcebuy,text="Force Buy rounds", font=("Montserrat", 18), text_color='white',fg_color='#292929')
         viz_1_title.grid(row=0, column=0,columnspan=2,sticky="nsew")
         
 
@@ -226,15 +220,15 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.frame_round_type_viz_fullbuy.grid_rowconfigure(1, weight=3)
         self.frame_round_type_viz_fullbuy.grid(row=1,column=2,pady=(0,15),padx=(0,10), sticky="nsew")
 
-        viz_1_title = ctk.CTkLabel(self.frame_round_type_viz_fullbuy,text="Full Buy rounds", font=("Montserrat", 18), text_color='white',fg_color='#8D8DB9',bg_color='#8D8DB9')
+        viz_1_title = ctk.CTkLabel(self.frame_round_type_viz_fullbuy,text="Full Buy rounds", font=("Montserrat", 18), text_color='white',fg_color='#292929')
         viz_1_title.grid(row=0, column=0,columnspan=2,sticky="nsew")
         
         ###frame top###
-        frame_top_3rd_row = ctk.CTkFrame(frame_right_top, corner_radius=20,fg_color='#8D8DB9',background_corner_colors=('#8D8DB9','#8D8DB9','',''))
+        frame_top_3rd_row = ctk.CTkFrame(frame_right_top,fg_color='#292929',background_corner_colors=('#292929','#292929','',''))
         frame_top_3rd_row.grid_columnconfigure((0,1,2,3), weight=1)
         frame_top_3rd_row.grid(row=2, column=0,columnspan=4, sticky="nsew")
 
-        frame_fb_vs_eco = ctk.CTkFrame(frame_top_3rd_row, corner_radius=20,fg_color='#28397F')
+        frame_fb_vs_eco = ctk.CTkFrame(frame_top_3rd_row,fg_color='#1a1a1a')
         frame_fb_vs_eco.grid_rowconfigure((0,1),weight=1)
         frame_fb_vs_eco.grid_columnconfigure(1,weight=1)
         frame_fb_vs_eco.grid(row=0,column=0,padx=(20,10), pady=5, sticky="nsew")
@@ -243,7 +237,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.value_fb_vs_eco = ctk.CTkLabel(frame_fb_vs_eco,text="", font=("Stratum2 Bd", 28), text_color='white')
         self.value_fb_vs_eco.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
 
-        frame_fb_vs_force = ctk.CTkFrame(frame_top_3rd_row, corner_radius=20,fg_color='#28397F')
+        frame_fb_vs_force = ctk.CTkFrame(frame_top_3rd_row,fg_color='#1a1a1a')
         frame_fb_vs_force.grid_rowconfigure((0,1),weight=1)
         frame_fb_vs_force.grid_columnconfigure(1,weight=1)
         frame_fb_vs_force.grid(row=0,column=1,padx=10, pady=5, sticky="nsew")
@@ -252,7 +246,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.value_fb_vs_force = ctk.CTkLabel(frame_fb_vs_force,text="", font=("Stratum2 Bd", 28), text_color='white')
         self.value_fb_vs_force.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
 
-        frame_eco_vs_fb = ctk.CTkFrame(frame_top_3rd_row, corner_radius=20,fg_color='#28397F')
+        frame_eco_vs_fb = ctk.CTkFrame(frame_top_3rd_row,fg_color='#1a1a1a')
         frame_eco_vs_fb.grid_rowconfigure((0,1),weight=1)
         frame_eco_vs_fb.grid_columnconfigure(1,weight=1)
         frame_eco_vs_fb.grid(row=0,column=2,padx=10, pady=5, sticky="nsew")
@@ -261,9 +255,8 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.value_eco_vs_fb = ctk.CTkLabel(frame_eco_vs_fb,text="", font=("Stratum2 Bd", 28), text_color='white')
         self.value_eco_vs_fb.grid(row=1,column=1,padx=10, pady=(5,20), sticky="nsew")
                              
-        
-
-        frame_force_vs_fb = ctk.CTkFrame(frame_top_3rd_row, corner_radius=20,fg_color='#28397F')
+    
+        frame_force_vs_fb = ctk.CTkFrame(frame_top_3rd_row,fg_color='#1a1a1a')
         frame_force_vs_fb.grid_rowconfigure((0,1),weight=1)
         frame_force_vs_fb.grid_columnconfigure(1,weight=1)
         frame_force_vs_fb.grid(row=0,column=3,padx=(10,20), pady=5, sticky="nsew")
@@ -274,14 +267,14 @@ class TeamSummaryPage(ctk.CTkFrame):
 
         
 
-        frame_right_bot = ctk.CTkFrame(self,fg_color="#8D8DB9",corner_radius=20,)
+        frame_right_bot = ctk.CTkFrame(self,fg_color="#292929")
         frame_right_bot.grid(row=2, column=1, padx=(10,20), pady=(0,20), sticky="nsew")
         # Configure grid for the frame_right_top (columns 1 and 2 combined)
         frame_right_bot.grid_columnconfigure((0, 1, 2), weight=1)
         frame_right_bot.grid_rowconfigure((0,1), weight=1)
 
        
-        frame_closest_win = ctk.CTkFrame(frame_right_bot, corner_radius=20,fg_color='#28397F')
+        frame_closest_win = ctk.CTkFrame(frame_right_bot,fg_color='#1a1a1a')
         frame_closest_win.grid_columnconfigure(0,weight=1)
         frame_closest_win.grid_columnconfigure(1,weight=3)
         frame_closest_win.grid_rowconfigure(0,weight=1)
@@ -292,7 +285,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.closest_win_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
 
-        frame_largest_win = ctk.CTkFrame(frame_right_bot, corner_radius=20 ,fg_color='#28397F')
+        frame_largest_win = ctk.CTkFrame(frame_right_bot,fg_color='#1a1a1a')
         frame_largest_win.grid_columnconfigure(0,weight=1)
         frame_largest_win.grid_columnconfigure(1,weight=3)
         frame_largest_win.grid_rowconfigure(0,weight=1)
@@ -303,7 +296,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.largest_win_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
     
-        frame_longest_winstreak = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
+        frame_longest_winstreak = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
         frame_longest_winstreak.grid(row=0,column=2,padx=(10,20), pady=(20,10), sticky="nsew")
         frame_longest_winstreak.grid_columnconfigure(0,weight=1)
         frame_longest_winstreak.grid_columnconfigure(1,weight=3)
@@ -314,7 +307,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.longest_winstreak_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
 
-        total_rounds_played_frame = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
+        total_rounds_played_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
         total_rounds_played_frame.grid(row=1,column=0,padx=(20,10), pady=(10,20), sticky="nsew")
         total_rounds_played_frame.grid_columnconfigure(0,weight=1)
         total_rounds_played_frame.grid_columnconfigure(1,weight=3)
@@ -324,7 +317,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.total_rounds_played_value = ctk.CTkLabel(total_rounds_played_frame,text="", font=("Stratum2 Bd", 20), text_color='white')
         self.total_rounds_played_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
-        define2_frame = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
+        define2_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
         define2_frame.grid(row=1,column=1,padx=(10,10), pady=(10,20), sticky="nsew")
         define2_frame.grid_columnconfigure(0,weight=1)
         define2_frame.grid_columnconfigure(1,weight=3)
@@ -334,7 +327,7 @@ class TeamSummaryPage(ctk.CTkFrame):
         define_2_label = ctk.CTkLabel(define2_frame,text="valeur", font=("Stratum2 Bd", 20), text_color='white')
         define_2_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
-        define3_frame = ctk.CTkFrame(frame_right_bot, fg_color='#28397F', corner_radius=20)
+        define3_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
         define3_frame.grid(row=1,column=2,padx=(10,20), pady=(10,20), sticky="nsew")
         define3_frame.grid_columnconfigure(0,weight=1)
         define3_frame.grid_columnconfigure(1,weight=3)
