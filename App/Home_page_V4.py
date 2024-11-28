@@ -51,19 +51,19 @@ class HomePage(ctk.CTkFrame):
         self.grid_rowconfigure(2, weight=1)
 
         #### frame subtitle + how to use ####
-        frame_body = ctk.CTkFrame(self)
+        frame_body = ctk.CTkFrame(self, fg_color='transparent')
         frame_body.grid(row=1, column=0, sticky="nwes")
         frame_body.grid_columnconfigure(0,weight=1)
         frame_body.grid_columnconfigure(1,weight=1)
         frame_body.grid_rowconfigure((1,2,3),weight=1)
 
-        frame_body_top = ctk.CTkFrame(frame_body)
+        frame_body_top = ctk.CTkFrame(frame_body,fg_color='#292929')
         frame_body_top.grid(row=0, column=0, columnspan=2, sticky="nwes", pady=(20,10),padx=20)
 
         label_1 = ctk.CTkLabel(frame_body_top, text="This tool aggregates data from one or multiple Counter-Strike 2 matches using demo files.\n\nIt provides comprehensive insights into team performance, individual player statistics, and a raw data tab for those who want to dive deeper into the gathered statistics.", font=('Montserrat', 18,'bold'))
         label_1.pack(pady=20)
 
-        frame_body_left = ctk.CTkFrame(frame_body)
+        frame_body_left = ctk.CTkFrame(frame_body,fg_color='#292929')
         frame_body_left.grid(row=1, column=0, sticky="nwes", pady=(10,20),padx=(20,10))
 
         button_1 = ctk.CTkButton(master=frame_body_left, text='Upload your demos', font=('Stratum2 Bd', 20), command=self.select_directory, height=40, width=250)
@@ -74,7 +74,7 @@ class HomePage(ctk.CTkFrame):
         button_2 = ctk.CTkButton(master=frame_body_left, text='Analyze', font=('Stratum2 Bd', 30), height=80, width=300,command=self.launch_analysis)
         button_2.pack(pady=20,padx=170)
 
-        frame_body_right = ctk.CTkFrame(frame_body)
+        frame_body_right = ctk.CTkFrame(frame_body,fg_color='#292929')
         frame_body_right.grid(row=1, column=1, sticky="nwes", pady=(10,20),padx=(10,20))
         label_1 = ctk.CTkLabel(frame_body_right, text="How to use", font=('Montserrat', 16,'bold'))
         label_1.pack(pady=20)

@@ -46,24 +46,118 @@ def transform_round_end(round_winner, first_round_tick):
 
 
 # 2. Fonctions de calcul des statistiques
-def calculate_match_stats(all_matches, team_name):
-    match_data = []
+# def calculate_match_stats(all_matches, team_name):
+#     match_data = []
     
+#     for i, match in enumerate(all_matches):
+#         round_info_df = match['round_info']
+#         team_wins, opponent_wins = calculate_match_result(round_info_df, team_name)
+
+#         game_id = f"Game_{i+1}"  # Nom du match
+#         game_name = match['team_info']['Game_id'].iloc[0]
+#         map_name = match['map_info'].iloc[0]['map_name']  # Nom de la map
+
+#         # Déterminer l'équipe victorieuse
+#         if team_wins > opponent_wins:
+#             winning_team = team_name
+#         else:
+#             winning_team = round_info_df['ct_team_clan_name'].iloc[0] if opponent_wins > team_wins else round_info_df['t_team_clan_name'].iloc[0]
+
+#         # Ajouter les informations de match
+#         match_data.append({
+#             "Game id": game_id,
+#             "Game Name": game_name,
+#             "Map": map_name,
+#             "Rounds Won by team": team_wins,
+#             "Rounds Won by Opponent": opponent_wins,
+#             "Winning Team": winning_team
+#         })
+
+#     # Créer un DataFrame avec les informations de chaque match
+#     match_df = pd.DataFrame(match_data)
+#     # Calculer les statistiques globales
+#     own_team_wins = match_df[match_df['Winning Team'] == team_name].shape[0]
+#     own_team_losses = match_df[match_df['Winning Team'] != team_name].shape[0]
+
+#     # Calculer le plus long winstreak
+#     winstreak = 0
+#     current_streak = 0
+#     for winning_team in match_df['Winning Team']:
+#         if winning_team == team_name:
+#             current_streak += 1
+#             winstreak = max(winstreak, current_streak)
+#         else:
+#             current_streak = 0
+
+#     # Nombre de fois où chaque carte a été jouée et le taux de victoire
+#     map_stats = match_df.groupby('Map').agg(
+#         times_played=('Map', 'size'),
+#         wins_on_map=('Winning Team', lambda x: (x == team_name).sum())
+#     )
+#     map_stats['winrate'] = (map_stats['wins_on_map'] / map_stats['times_played']) * 100
+
+#     # Retourner les statistiques sous forme de dictionnaire
+#     return {
+#         "match_results": match_df,
+#         "own_team_wins": own_team_wins,
+#         "own_team_losses": own_team_losses,
+#         "winstreak": winstreak,
+#         "map_stats": map_stats
+#     }
+
+# def calculate_match_result(round_info_df, team_name):
+#     ct_wins = round_info_df[round_info_df['winner'] == 'CT'].groupby('ct_team_clan_name').size()
+#     t_wins = round_info_df[round_info_df['winner'] == 'T'].groupby('t_team_clan_name').size()
+#     team_wins = ct_wins.get(team_name, 0) + t_wins.get(team_name, 0)
+#     opponent_wins = round_info_df['round'].max() - team_wins
+#     return team_wins, opponent_wins
+
+def calculate_match_result(round_info_df, team_name):    
+    # Victoires pour l'équipe CT
+    ct_wins = round_info_df[round_info_df['winner'] == 'CT'].groupby('ct_team_clan_name').size()
+    # Victoires pour l'équipe T
+    t_wins = round_info_df[round_info_df['winner'] == 'T'].groupby('t_team_clan_name').size()
+
+    # Total des victoires de l'équipe
+    team_wins = ct_wins.get(team_name, 0) + t_wins.get(team_name, 0)
+    # Total des rounds joués
+    total_rounds = len(round_info_df)
+    # Victoires de l'adversaire
+    opponent_wins = total_rounds - team_wins
+
+    return team_wins, opponent_wins
+
+
+def calculate_match_stats(all_matches, team_name):
+    
+    match_data = []
+
     for i, match in enumerate(all_matches):
+        # Récupérer les données des rounds pour ce match
         round_info_df = match['round_info']
+        # Calculer les victoires de l'équipe et de l'adversaire
         team_wins, opponent_wins = calculate_match_result(round_info_df, team_name)
 
-        game_id = f"Game_{i+1}"  # Nom du match
+        # Récupérer les informations du match
+        game_id = f"Game_{i+1}"  # Nom unique du match
         game_name = match['team_info']['Game_id'].iloc[0]
-        map_name = match['map_info'].iloc[0]['map_name']  # Nom de la map
+        map_name = match['map_info']['map_name'].iloc[0]  # Nom de la carte
 
-        # Déterminer l'équipe victorieuse
+        # Identifier les équipes CT et T au début du match
+        first_ct_team = round_info_df['ct_team_clan_name'].iloc[0]
+        first_t_team = round_info_df['t_team_clan_name'].iloc[0]
+
+        # Déterminer l'équipe gagnante
         if team_wins > opponent_wins:
             winning_team = team_name
         else:
-            winning_team = round_info_df['ct_team_clan_name'].iloc[0] if opponent_wins > team_wins else round_info_df['t_team_clan_name'].iloc[0]
+            # Si l'équipe adverse a gagné, déterminer si elle était CT ou T
+            if first_ct_team != team_name:
+                winning_team = first_ct_team
+            else:
+                winning_team = first_t_team
 
-        # Ajouter les informations de match
+        # Ajouter les informations du match
         match_data.append({
             "Game id": game_id,
             "Game Name": game_name,
@@ -73,9 +167,10 @@ def calculate_match_stats(all_matches, team_name):
             "Winning Team": winning_team
         })
 
-    # Créer un DataFrame avec les informations de chaque match
+    # Créer un DataFrame avec les résultats des matchs
     match_df = pd.DataFrame(match_data)
-    # Calculer les statistiques globales
+
+    # Calculer les victoires et défaites globales
     own_team_wins = match_df[match_df['Winning Team'] == team_name].shape[0]
     own_team_losses = match_df[match_df['Winning Team'] != team_name].shape[0]
 
@@ -89,7 +184,7 @@ def calculate_match_stats(all_matches, team_name):
         else:
             current_streak = 0
 
-    # Nombre de fois où chaque carte a été jouée et le taux de victoire
+    # Statistiques par carte
     map_stats = match_df.groupby('Map').agg(
         times_played=('Map', 'size'),
         wins_on_map=('Winning Team', lambda x: (x == team_name).sum())
@@ -104,13 +199,6 @@ def calculate_match_stats(all_matches, team_name):
         "winstreak": winstreak,
         "map_stats": map_stats
     }
-
-def calculate_match_result(round_info_df, team_name):
-    ct_wins = round_info_df[round_info_df['winner'] == 'CT'].groupby('ct_team_clan_name').size()
-    t_wins = round_info_df[round_info_df['winner'] == 'T'].groupby('t_team_clan_name').size()
-    team_wins = ct_wins.get(team_name, 0) + t_wins.get(team_name, 0)
-    opponent_wins = round_info_df['round'].max() - team_wins
-    return team_wins, opponent_wins
 
 def detailed_match_result(match_df, team_name):
     # Analyse des victoires et défaites
@@ -347,11 +435,13 @@ def calculate_entry_stats(joueurs, all_matches):
         all_opening_stats = pd.concat([all_opening_stats, opening_stats])
 
     all_opening_stats_grouped = all_opening_stats.groupby('name').sum().reset_index()
-    all_opening_stats_grouped["%_entry_success(T)"] = round((all_opening_stats_grouped["entry_successes(T)"] / all_opening_stats_grouped["entry_attempts(T)"]) * 100, 0)
-    all_opening_stats_grouped["%_open_success(CT)"] = round((all_opening_stats_grouped["open_successes(CT)"] / all_opening_stats_grouped["open_attempts(CT)"]) * 100, 0)
+    all_opening_stats_grouped["%_entry_success(T)"] = round((all_opening_stats_grouped["entry_successes(T)"] / all_opening_stats_grouped["entry_attempts(T)"]) * 100, 0).fillna(0)
+    all_opening_stats_grouped["%_open_success(CT)"] = round((all_opening_stats_grouped["open_successes(CT)"] / all_opening_stats_grouped["open_attempts(CT)"]) * 100, 0).fillna(0)
 
     column_order = ['name', 'entry_attempts(T)', 'entry_successes(T)', '%_entry_success(T)', 'open_attempts(CT)', 'open_successes(CT)', '%_open_success(CT)']
     all_opening_stats_grouped = all_opening_stats_grouped[column_order]
+    numeric_columns = ['entry_attempts(T)', 'entry_successes(T)', 'open_attempts(CT)', 'open_successes(CT)']
+    all_opening_stats_grouped[numeric_columns] = all_opening_stats_grouped[numeric_columns].astype(int)
     entry_stats = joueurs.merge(all_opening_stats_grouped, on='name', how='left')
     return entry_stats
 
@@ -531,24 +621,23 @@ def calculate_player_stats(joueurs, all_matches):
             ]
     scoreboard = scoreboard[nouvel_ordre_colonnes]
 
-    numeric_columns = ['Rounds joués', 'Kills', 'Deaths', 'Assists', '+/-','K/D','5K', '4K', '3K', 'mvps','KAST%']
+    numeric_columns = ['Rounds joués', 'Kills', 'Deaths', 'Assists', '+/-','5K', '4K', '3K', 'mvps','KAST%']
     scoreboard[numeric_columns] = scoreboard[numeric_columns].astype(int)
     
-    return scoreboard.sort_values(by=['Rating'],ascending=False)
+    return scoreboard.sort_values(by=['Rounds joués','Rating'],ascending=False)
 
 
-
-
-
+#D:/Python/projet_cs_v2/demos_G1
 
 # 3. Fonction principale
-def cumulate_stats(team_name="GenOne Academie", file_paths="D:/Python/projet_cs_v2/demos_G1"):
+def cumulate_stats(team_name="", file_paths=""):
     # Sélection du répertoire et initialisation des variables
     demo_directory = select_directory(file_paths)
     if not demo_directory:
         print("No directory selected.")
         return
     all_matches = []
+    all_players = []
 
     # Parsing des fichiers de démos
     for filename in glob(os.path.join(demo_directory, "*.dem")):
@@ -576,7 +665,9 @@ def cumulate_stats(team_name="GenOne Academie", file_paths="D:/Python/projet_cs_
         team = demo.parse_ticks(["team_clan_name", "team_name"])
         team = team[(team['tick'] >= first_round_tick) & (team['tick'] <= max_tick)].copy()
         team.rename(columns={'team_name': 'side'}, inplace=True)
-
+        
+        team_players = team.loc[(team['team_clan_name'] == team_name) & (team['tick'] == first_round_tick),['name']].drop_duplicates()
+        
         unique_teams = team['team_clan_name'].unique()
         adversary_team = [t for t in unique_teams if t != team_name][0]
         game_id = f"VS_{adversary_team}" 
@@ -625,9 +716,11 @@ def cumulate_stats(team_name="GenOne Academie", file_paths="D:/Python/projet_cs_
         }
         all_matches.append(match_data_single)
 
+        all_players.append(team_players)
+
     # Calculer les statistiques de match
     match_stats = calculate_match_stats(all_matches, team_name)
-    joueurs = pd.DataFrame({'name': team.loc[(team['team_clan_name'] == team_name) & (team['tick'] == first_round_tick), 'name'].unique()})
+    joueurs = pd.concat(all_players, ignore_index=True).drop_duplicates('name')
     util_stats = calculate_util_stats(joueurs, all_matches)
     scoreboard = calculate_player_stats(joueurs, all_matches)
     entry_stats = calculate_entry_stats(joueurs, all_matches)
@@ -635,7 +728,6 @@ def cumulate_stats(team_name="GenOne Academie", file_paths="D:/Python/projet_cs_
     wr_per_round_type = calculate_wr_per_round_type(all_matches, team_name)
     trading_stats = calculate_trading_stats(joueurs, all_matches)
     detailed_results = detailed_match_result(match_stats["match_results"], team_name)
-
     # Retourner tous les résultats
     results = {
         "match_results": match_stats["match_results"],
@@ -646,16 +738,15 @@ def cumulate_stats(team_name="GenOne Academie", file_paths="D:/Python/projet_cs_
         "wr_per_round_type": wr_per_round_type["round_type_analysis"],
         "special_round_type":wr_per_round_type["special_cases"],
         "util_stats": util_stats,
-        # "player_stats": player_stats,
         "entry_stats": entry_stats,
         "eco_kills": eco_kills,
-        # "advanced_stats": advanced_stats,
         "trading_stats": trading_stats,
         "detailed_match_results": detailed_results,
-        "scoreboard":scoreboard
+        "scoreboard":scoreboard,
+        "joueurs":joueurs
     }
     return results
-
+        
 results = cumulate_stats()
 # print("Map Stats:\n", results['map_stats'])
 # print("Win Rate per Round Type:\n", results['wr_per_round_type'])
@@ -665,7 +756,8 @@ results = cumulate_stats()
 # print("Eco Kills:\n", results['eco_kills'])
 # print("Trading Stats:\n", results['trading_stats'])
 # print("Detailed Match Results:\n", results['detailed_match_results'])
-#print("scoreboard:\n", results['scoreboard'])
+# print("scoreboard:\n", results['scoreboard'])
+# print(results["joueurs"])
 
 # Utilisation de la fonction
 
