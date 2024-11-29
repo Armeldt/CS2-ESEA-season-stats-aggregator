@@ -1,9 +1,11 @@
 import customtkinter as ctk
-from App.Home_page import HomePage
-from App.Team_summary_page import TeamSummaryPage
-from App.Players_details_page import PlayerDetailPage
-from App.Raw_data_page import RawDataPage
+from Home_page import HomePage
+from Team_summary_page import TeamSummaryPage
+from Players_details_page import PlayerDetailPage
+from Raw_data_page import RawDataPage
 
+ctk.set_appearance_mode('dark')
+ctk.set_default_color_theme("App/theme.json")
 
 class App(ctk.CTk):
     def __init__(self):

@@ -7,7 +7,7 @@ import os
 import tkinter
 from tkinter import filedialog, Text
 import tkinter.messagebox
-from App.Demo_analyse_script import *
+from Demo_analyse_script import *
 
 
 ########################### 
@@ -22,8 +22,8 @@ from App.Demo_analyse_script import *
 # gris clair de la bannière : #d9d9d9
 # Font : Stratum2
 
-ctk.set_appearance_mode('dark')
-ctk.set_default_color_theme("theme.json")
+# ctk.set_appearance_mode('dark')
+# ctk.set_default_color_theme("theme.json")
 
 
 file_paths = ""

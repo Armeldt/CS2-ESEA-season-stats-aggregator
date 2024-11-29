@@ -7,7 +7,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import pandas as pd
        
-    
+# ctk.set_appearance_mode('dark')
+# ctk.set_default_color_theme("App/theme.json")
 
 def round_corners_top(image, radius, background_color=(41, 41, 41)):
     """Applique des coins arrondis uniquement en haut à une image et ajoute une couleur de fond."""
@@ -64,9 +65,6 @@ def update_gauge_chart(parent, value,value1,value2, title_text, gauge_color, row
     canvas.get_tk_widget().config(bg="#292929", highlightthickness=0)
     canvas.get_tk_widget().grid(row=row, column=column, sticky="nsew")
 
-
-ctk.set_appearance_mode('dark')
-ctk.set_default_color_theme("theme.json")
 
 class TeamSummaryPage(ctk.CTkFrame):
     def __init__(self, parent):
