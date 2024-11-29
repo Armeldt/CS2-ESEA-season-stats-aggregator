@@ -1,8 +1,8 @@
 import customtkinter as ctk
-from Home_page_V4 import HomePage
-from Team_summary_page_V5 import TeamSummaryPage
-from Players_details_page_V5 import PlayerDetailPage
-from Raw_data_page_V4 import RawDataPage
+from App.Home_page import HomePage
+from App.Team_summary_page import TeamSummaryPage
+from App.Players_details_page import PlayerDetailPage
+from App.Raw_data_page import RawDataPage
 
 
 class App(ctk.CTk):
