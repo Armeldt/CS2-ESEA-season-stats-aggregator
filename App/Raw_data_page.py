@@ -7,8 +7,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import pandas as pd
 
-ctk.set_appearance_mode('dark')
-ctk.set_default_color_theme("theme.json")
+# ctk.set_appearance_mode('dark')
+# ctk.set_default_color_theme("/App/theme.json")
         
 
 class RawDataPage(ctk.CTkFrame):

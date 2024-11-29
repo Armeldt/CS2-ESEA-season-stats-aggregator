@@ -9,8 +9,9 @@ from matplotlib.figure import Figure
 import pandas as pd
 
 
-ctk.set_appearance_mode('dark')
-ctk.set_default_color_theme("theme.json")
+
+# ctk.set_appearance_mode('dark')
+# ctk.set_default_color_theme("/App/theme.json")
 
 def update_stacked_bar_chart_utils(parent, df_utils, row, column):
  # Création du stacked bar chart
