@@ -382,12 +382,12 @@ class TeamSummaryPage(ctk.CTkFrame):
                     text=f"{detailed_match_results['closest_loss']['game_name']} {detailed_match_results['closest_loss']['team_score']} - {detailed_match_results['closest_loss']['opponent_score']}"
                 )
             else:
-                self.closest_win_value.configure(text="Aucune défaite enregistrée.")
+                self.closest_loss_value.configure(text="Aucune défaite enregistrée.")
 
 
             # Defaite la plus large
             if detailed_match_results["largest_loss"]:
-                self.closest_win_value.configure(
+                self.largest_loss_value.configure(
                     text=f"{detailed_match_results['largest_loss']['game_name']} {detailed_match_results['largest_loss']['team_score']} - {detailed_match_results['largest_loss']['opponent_score']}"
                 )
             else:
