@@ -305,8 +305,28 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.longest_winstreak_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
 
+        frame_closest_loss = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
+        frame_closest_loss.grid(row=1,column=0,padx=(20,10), pady=(10,20), sticky="nsew")
+        frame_closest_loss.grid_columnconfigure(0,weight=1)
+        frame_closest_loss.grid_columnconfigure(1,weight=3)
+        frame_closest_loss.grid_rowconfigure(0,weight=1)
+        closest_loss_label = ctk.CTkLabel(frame_closest_loss,text="Closest loss :", font=("Montserrat", 14), text_color='white')
+        closest_loss_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
+        self.closest_loss_value = ctk.CTkLabel(frame_closest_loss,text="valeur", font=("Stratum2 Bd", 20), text_color='white')
+        self.closest_loss_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
+
+        largest_loss_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
+        largest_loss_frame.grid(row=1,column=1,padx=(10,10), pady=(10,20), sticky="nsew")
+        largest_loss_frame.grid_columnconfigure(0,weight=1)
+        largest_loss_frame.grid_columnconfigure(1,weight=3)
+        largest_loss_frame.grid_rowconfigure(0,weight=1)
+        largest_loss_label = ctk.CTkLabel(largest_loss_frame,text="Largest loss :", font=("Montserrat", 14), text_color='white')
+        largest_loss_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
+        self.largest_loss_value = ctk.CTkLabel(largest_loss_frame,text="valeur", font=("Stratum2 Bd", 20), text_color='white')
+        self.largest_loss_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
+    
         total_rounds_played_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
-        total_rounds_played_frame.grid(row=1,column=0,padx=(20,10), pady=(10,20), sticky="nsew")
+        total_rounds_played_frame.grid(row=1,column=2,padx=(10,20), pady=(10,20), sticky="nsew")
         total_rounds_played_frame.grid_columnconfigure(0,weight=1)
         total_rounds_played_frame.grid_columnconfigure(1,weight=3)
         total_rounds_played_frame.grid_rowconfigure(0,weight=1)
@@ -315,26 +335,6 @@ class TeamSummaryPage(ctk.CTkFrame):
         self.total_rounds_played_value = ctk.CTkLabel(total_rounds_played_frame,text="", font=("Stratum2 Bd", 20), text_color='white')
         self.total_rounds_played_value.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
 
-        define2_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
-        define2_frame.grid(row=1,column=1,padx=(10,10), pady=(10,20), sticky="nsew")
-        define2_frame.grid_columnconfigure(0,weight=1)
-        define2_frame.grid_columnconfigure(1,weight=3)
-        define2_frame.grid_rowconfigure(0,weight=1)
-        define_2_label = ctk.CTkLabel(define2_frame,text="KPI a définir :", font=("Montserrat", 14), text_color='white')
-        define_2_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
-        define_2_label = ctk.CTkLabel(define2_frame,text="valeur", font=("Stratum2 Bd", 20), text_color='white')
-        define_2_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
-
-        define3_frame = ctk.CTkFrame(frame_right_bot, fg_color='#1a1a1a')
-        define3_frame.grid(row=1,column=2,padx=(10,20), pady=(10,20), sticky="nsew")
-        define3_frame.grid_columnconfigure(0,weight=1)
-        define3_frame.grid_columnconfigure(1,weight=3)
-        define3_frame.grid_rowconfigure(0,weight=1)
-        define_3_label = ctk.CTkLabel(define3_frame,text="KPI a définir :", font=("Montserrat", 14), text_color='white')
-        define_3_label.grid(row=0,column=0,padx=(10,0), pady=10, sticky="nsew")
-        define_3_label = ctk.CTkLabel(define3_frame,text="valeur", font=("Stratum2 Bd", 20), text_color='white')
-        define_3_label.grid(row=0,column=1,padx=(0,15), pady=10, sticky="nsew")
-    
     def update_data(self, analysis_results):
         # Vérifiez que les résultats d'analyse contiennent les données nécessaires
         if analysis_results:
@@ -376,8 +376,25 @@ class TeamSummaryPage(ctk.CTkFrame):
 
             self.longest_winstreak_value.configure(text=winstreak)
 
+            # Defaite la plus serrée
+            if detailed_match_results["closest_loss"]:
+                self.closest_loss_value.configure(
+                    text=f"{detailed_match_results['closest_loss']['game_name']} {detailed_match_results['closest_loss']['team_score']} - {detailed_match_results['closest_loss']['opponent_score']}"
+                )
+            else:
+                self.closest_win_value.configure(text="Aucune défaite enregistrée.")
+
+
+            # Defaite la plus large
+            if detailed_match_results["largest_loss"]:
+                self.closest_win_value.configure(
+                    text=f"{detailed_match_results['largest_loss']['game_name']} {detailed_match_results['largest_loss']['team_score']} - {detailed_match_results['largest_loss']['opponent_score']}"
+                )
+            else:
+                self.largest_loss_value.configure(text="Aucune défaite enregistrée.")
+
             self.total_rounds_played_value.configure(text=round_stats['total_rounds'].sum())
-        
+
             if not map_stats.empty:
                 # Exemple pour afficher les stats de de_anubis
                 if "de_ancient" in map_stats.index:
