@@ -140,7 +140,7 @@ def calculate_match_stats(all_matches, team_name):
 def detailed_match_result(match_df, team_name):
     # Analyse des victoires et défaites
     match_df['round_diff'] = abs(match_df['Rounds Won by team'] - match_df['Rounds Won by Opponent'])
-
+    match_df['total_rounds'] = abs(match_df['Rounds Won by team'] + match_df['Rounds Won by Opponent'])
     # Filtrer les victoires et les défaites de l'équipe
     team_victories = match_df[match_df['Winning Team'] == team_name]
     team_losses = match_df[match_df['Winning Team'] != team_name]
@@ -166,7 +166,14 @@ def detailed_match_result(match_df, team_name):
         }
 
         # Victoire la plus serrée
-        closest_win = team_victories.loc[team_victories['round_diff'].idxmin()]
+        #closest_win = team_victories.loc[team_victories['round_diff'].idxmin()]
+        min_round_diff_idx = team_victories['round_diff'].idxmin()
+        max_total_rounds_idx = team_victories['total_rounds'].idxmax()
+        closest_win = team_victories.loc[
+            (team_victories['round_diff'] == team_victories.loc[min_round_diff_idx, 'round_diff']) &
+            (team_victories['total_rounds'] == team_victories.loc[max_total_rounds_idx, 'total_rounds'])
+        ].iloc[0]  
+
         result_summary["closest_win"] = {
             "game_name": closest_win['Game Name'],
             "map": closest_win['Map'],
@@ -188,7 +195,14 @@ def detailed_match_result(match_df, team_name):
         }
 
         # Défaite la plus serrée
-        closest_loss = team_losses.loc[team_losses['round_diff'].idxmin()]
+        #closest_loss = team_losses.loc[(team_losses['round_diff'].idxmin())&(team_losses['total_rounds'].idxmax())]
+        min_round_diff_idx = team_losses['round_diff'].idxmin()
+        max_total_rounds_idx = team_losses['total_rounds'].idxmax()
+        closest_loss = team_losses.loc[
+            (team_losses['round_diff'] == team_losses.loc[min_round_diff_idx, 'round_diff']) &
+            (team_losses['total_rounds'] == team_losses.loc[max_total_rounds_idx, 'total_rounds'])
+        ].iloc[0]  
+
         result_summary["closest_loss"] = {
             "game_name": closest_loss['Game Name'],
             "map": closest_loss['Map'],
