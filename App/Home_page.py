@@ -22,9 +22,6 @@ from Demo_analyse_script import *
 # gris clair de la bannière : #d9d9d9
 # Font : Stratum2
 
-# ctk.set_appearance_mode('dark')
-# ctk.set_default_color_theme("theme.json")
-
 
 
 instructions_text = (
@@ -180,8 +177,6 @@ class HomePage(ctk.CTkFrame):
         close_button.grid(column=0,row=1,pady=(10, 20))
 
 
-
-
     # def get_team_name(self, event=None):
     #     self.team_name = self.entry_1.get().strip() 
 
@@ -204,14 +199,6 @@ class HomePage(ctk.CTkFrame):
         # Appeler la fonction d'analyse
         results = cumulate_stats(self.team_name, self.file_paths)
         self.master.set_analysis_results(results)
-
-
-            
-
-       
-            
-
-
 
 
 if __name__ == "__main__":

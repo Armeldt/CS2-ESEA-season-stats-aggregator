@@ -4,9 +4,6 @@ import os
 from demoparser2 import *
 from glob import glob
 
-
-
-
 # 1. Fonctions utilitaires
 
 def select_directory(file_paths=""):

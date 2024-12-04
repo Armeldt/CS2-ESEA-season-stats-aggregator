@@ -9,8 +9,6 @@ import pandas as pd
 import sys
 import os
        
-# ctk.set_appearance_mode('dark')
-# ctk.set_default_color_theme("App/theme.json")
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):

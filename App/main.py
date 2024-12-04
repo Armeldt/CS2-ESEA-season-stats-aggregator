@@ -17,10 +17,8 @@ def resource_path(relative_path):
 
 theme_file = resource_path("theme.json")
 
-
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme(theme_file)
-
 
 
 class App(ctk.CTk):
