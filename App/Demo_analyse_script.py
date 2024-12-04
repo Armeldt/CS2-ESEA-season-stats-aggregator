@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
-from demoparser2 import DemoParser
 import os
+from demoparser2 import *
 from glob import glob
+
+
+
 
 # 1. Fonctions utilitaires
 
@@ -580,20 +583,15 @@ def calculate_player_stats(joueurs, all_matches):
 
 # 3. Fonction principale
 
-def cumulate_stats(team_name="", file_paths=""):
+def cumulate_stats(team_name, file_paths):
     # Sélection du répertoire et initialisation des variables
     demo_directory = select_directory(file_paths)
-    if not demo_directory:
-        print("No directory selected")
-        return
     all_matches = []
     all_players = []
 
     # Parsing des fichiers de démos
     for filename in glob(os.path.join(demo_directory, "*.dem")):
-
         demo = DemoParser(os.path.join(demo_directory, filename))
-
         tick_round_start = demo.parse_event("round_start").drop([0,1,2])
         tick_round_start.rename(columns={'tick':'tick_start_round'},inplace=True)
         tick_freezetime_end = demo.parse_event("round_freeze_end",other=['total_rounds_played'])[["total_rounds_played",'tick']]
@@ -696,6 +694,7 @@ def cumulate_stats(team_name="", file_paths=""):
         "joueurs":joueurs
     }
     return results
+
         
 # results = cumulate_stats()
 # print("Map Stats:\n", results['map_stats'])
@@ -712,8 +711,8 @@ def cumulate_stats(team_name="", file_paths=""):
 # Utilisation de la fonction
 
 
-# def run_analysis(team_name, file_paths):
-#     # Appelle cumulate_stats avec les paramètres fournis
-#     results = cumulate_stats(team_name=team_name, file_paths=file_paths)
-#     return results
 
+
+
+
+    

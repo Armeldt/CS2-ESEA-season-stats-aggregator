@@ -3,9 +3,25 @@ from Home_page import HomePage
 from Team_summary_page import TeamSummaryPage
 from Players_details_page import PlayerDetailPage
 from Raw_data_page import RawDataPage
+import sys
+import os
+
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        # Mode exécutable : PyInstaller extrait les fichiers dans _MEIPASS
+        return os.path.join(sys._MEIPASS, relative_path)
+    # Mode script Python
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
+theme_file = resource_path("theme.json")
+
 
 ctk.set_appearance_mode('dark')
-ctk.set_default_color_theme("App/theme.json")
+ctk.set_default_color_theme(theme_file)
+
+
 
 class App(ctk.CTk):
     def __init__(self):

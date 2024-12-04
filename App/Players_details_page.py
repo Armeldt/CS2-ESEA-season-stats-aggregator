@@ -8,8 +8,6 @@ import numpy as np
 from matplotlib.figure import Figure
 import pandas as pd
 
-
-
 # ctk.set_appearance_mode('dark')
 # ctk.set_default_color_theme("/App/theme.json")
 

@@ -26,8 +26,6 @@ from Demo_analyse_script import *
 # ctk.set_default_color_theme("theme.json")
 
 
-file_paths = ""
-team_name = ""  # Définir file_paths ici pour l'utiliser globalement
 
 instructions_text = (
                 "Follow these simple steps:\n\n"
@@ -39,11 +37,29 @@ instructions_text = (
                 "6. Navigate through the pages to see how you performed individually and as a team")
 
 
+def show_custom_popup(message):
+    # Création d'une nouvelle fenêtre (Toplevel)
+    popup = ctk.CTkToplevel()
+    popup.geometry("300x150")
+    popup.geometry(f"+{650}+{375}")  # Dimensions de la fenêtre
+    popup.title("Information")  # Titre de la fenêtre
+    popup.attributes("-topmost", True)
+
+    # Texte affiché dans la fenêtre
+    label = ctk.CTkLabel(popup, text=message, font=("Montserrat", 14))
+    label.pack(pady=20)
+
+    # Bouton pour fermer la fenêtre
+    button = ctk.CTkButton(popup, text="OK", command=popup.destroy)
+    button.pack(pady=10)
+
 
 class HomePage(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.file_paths = None
+        self.team_name = None
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -69,7 +85,7 @@ class HomePage(ctk.CTkFrame):
         button_1 = ctk.CTkButton(master=frame_body_left, text='Upload your demos', font=('Stratum2 Bd', 20), command=self.select_directory, height=40, width=250)
         button_1.pack(pady=(80,20))
         self.entry_1 = ctk.CTkEntry(master=frame_body_left, placeholder_text="Type the name of your team", font=('Stratum2 Bd', 20), justify='center', width=250)
-        self.entry_1.bind("<Return>", self.get_team_name)
+        self.entry_1.bind("<Return>", self.team_name)
         self.entry_1.pack(pady=20)
         button_2 = ctk.CTkButton(master=frame_body_left, text='Analyze', font=('Stratum2 Bd', 30), height=80, width=300,command=self.launch_analysis)
         button_2.pack(pady=20,padx=170)
@@ -163,26 +179,37 @@ class HomePage(ctk.CTkFrame):
         close_button = ctk.CTkButton(dialog, text="Close", command=dialog.destroy)
         close_button.grid(column=0,row=1,pady=(10, 20))
 
-    def get_team_name(self, event=None): 
-        self.team_name = self.entry_1.get()  # Accéder au texte de l'entrée
-        print(f"Team name: {self.team_name}")
-        self.parent.team_name = self.team_name
 
-    
-    def launch_analysis(self):
-        self.get_team_name()  # Assure-toi que `team_name` est mis à jour
-        if hasattr(self, 'team_name') and self.file_paths:
-            results = cumulate_stats(self.team_name, self.file_paths)
-            self.master.set_analysis_results(results)
-        else:
-            print("Team name or file path is missing.")
+
+
+    # def get_team_name(self, event=None):
+    #     self.team_name = self.entry_1.get().strip() 
 
     def select_directory(self):
         self.file_paths = filedialog.askdirectory(title="Select demo folder")
-        if self.file_paths:  # Vérifie si un dossier a bien été sélectionné
-            print(f"Directory selected: {self.file_paths}")
-        else:
-            print("No directory selected.")
+
+    def launch_analysis(self):
+ 
+        self.team_name = self.entry_1.get().strip()
+        self.master.team_name = self.team_name
+        
+        if not self.file_paths:
+            show_custom_popup("No directory selected.")
+            return
+
+        if not self.team_name:
+            show_custom_popup("Please enter a team name.")
+            return
+        
+        # Appeler la fonction d'analyse
+        results = cumulate_stats(self.team_name, self.file_paths)
+        self.master.set_analysis_results(results)
+
+
+            
+
+       
+            
 
 
 

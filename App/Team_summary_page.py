@@ -6,9 +6,26 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import pandas as pd
+import sys
+import os
        
 # ctk.set_appearance_mode('dark')
 # ctk.set_default_color_theme("App/theme.json")
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        # Mode exécutable : PyInstaller extrait les fichiers dans _MEIPASS
+        return os.path.join(sys._MEIPASS, relative_path)
+    # Mode script Python
+    return os.path.join(os.path.abspath("."), relative_path)
+
+ancient_img = resource_path('Assets/ancient.png')
+mirage_img = resource_path('Assets/mirage.png')
+inferno_img = resource_path('Assets/inferno.png')
+nuke_img = resource_path('Assets/nuke.png')
+dust2_img = resource_path('Assets/dust2.jpg')
+vertigo_img = resource_path('Assets/vertigo.png')
+anubis_img = resource_path('Assets/anubis.png')
 
 def round_corners_top(image, radius, background_color=(41, 41, 41)):
     """Applique des coins arrondis uniquement en haut à une image et ajoute une couleur de fond."""
@@ -112,13 +129,13 @@ class TeamSummaryPage(ctk.CTkFrame):
 
         # chargement des images
         target_size = (200, 100)  # Dimensions finales
-        self.ancient_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/ancient.png'), 15), size=target_size)
-        self.mirage_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/mirage.png'), 15), size=target_size)
-        self.nuke_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/nuke.png'), 15), size=target_size)
-        self.dust2_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/dust2.jpg'), 15), size=target_size)
-        self.anubis_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/anubis.png'), 15), size=target_size)
-        self.vertigo_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/vertigo.png'), 15), size=target_size)
-        self.inferno_img = ctk.CTkImage(dark_image=round_corners_top(Image.open('Assets/Maps/inferno.png'), 15), size=target_size)
+        self.ancient_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(ancient_img), 15), size=target_size)
+        self.mirage_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(mirage_img), 15), size=target_size)
+        self.nuke_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(nuke_img), 15), size=target_size)
+        self.dust2_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(dust2_img), 15), size=target_size)
+        self.anubis_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(anubis_img), 15), size=target_size)
+        self.vertigo_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(vertigo_img), 15), size=target_size)
+        self.inferno_img = ctk.CTkImage(dark_image=round_corners_top(Image.open(inferno_img), 15), size=target_size)
         
         # Créer un frame avec un fond bleu et une largeur fixée à celle de l'image
         self.frame_map_1 = ctk.CTkFrame(frame_left, fg_color='#1a1a1a',width=250, height=180, background_corner_colors=('#292929', '#292929', '#292929', '#292929'))
