@@ -1,11 +1,7 @@
 import customtkinter as ctk
-import tkinter as tk
-from PIL import Image, ImageOps, ImageDraw
 from CTkTable import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import numpy as np
-from matplotlib.figure import Figure
 import pandas as pd
 
 

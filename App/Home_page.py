@@ -1,12 +1,7 @@
 import customtkinter as ctk
 from customtkinter import *
 from CTkTable import *
-from tkinter import filedialog
-from PIL import Image
-import os
-import tkinter
-from tkinter import filedialog, Text
-import tkinter.messagebox
+from tkinter import filedialog 
 from Demo_analyse_script import *
 
 
